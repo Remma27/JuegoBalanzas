@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable eol-last */
-
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -32,6 +30,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
+        zIndex: 1, // Colocar las cajas debajo de los cubos
     },
     counter: {
         position: 'absolute',
@@ -56,7 +55,7 @@ export const styles = StyleSheet.create({
         borderColor: '#999',
         alignItems: 'center',
         justifyContent: 'center',
-        cursor: 'grab',
+        zIndex: 2, // Colocar los cubos encima de las cajas
     },
     cubeText: {
         color: 'white',
