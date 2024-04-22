@@ -1,10 +1,9 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
-import DragAndDrop from './src/components/DragAndDrop';
+import BalancingScales from './src/components/BalancingScales';
 
 const App = () => {
-  return <DragAndDrop />;
+  return <BalancingScales />;
 };
 
 export default App;
-
-

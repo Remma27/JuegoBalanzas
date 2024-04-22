@@ -84,5 +84,42 @@ export const styles = StyleSheet.create({
         borderRadius: 10,
         alignSelf: 'center',
     },
+    textareaContainer: {
+        padding: 10,
+        height: '30%',
+        borderColor: '#355DA8',
+        borderWidth: 1,
+        marginBottom: 10,
+    },
+    textarea: {
+        backgroundColor: '#FFFFFF',
+        color: '#000000',
+        textAlignVertical: 'top',
+        height: '100%',
+        fontSize: 16,
+        padding: 5,
+        borderColor: '#355DA8',
+        borderWidth: 1,
+    },
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+    },
+    texto: {
+        margin: 5,
+        height: 40,
+        width: '85%',
+        borderStyle: 'solid',
+        borderColor: '#355DA8',
+        borderWidth: 1,
+        fontSize: 16,
+    },
+    btnEnviar: {
+        backgroundColor: '#355DA8',
+        marginTop: 5,
+        height: 40,
+        paddingTop: 10,
+    },
 });
 
