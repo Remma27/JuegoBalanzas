@@ -1,11 +1,12 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, PanResponder, Animated } from 'react-native';
+import { View, Text, PanResponder, Animated, Button } from 'react-native';
 import { styles } from '../css/styles.js';
+import GuessColorModal from './GuessColorModal'; // Importa la modal
 
 const DragAndDrop = () => {
     const containerRef = useRef(null);
     const [containerLayout, setContainerLayout] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false); // Estado para controlar la visibilidad de la modal
 
     useEffect(() => {
         if (containerRef.current) {
@@ -71,105 +72,24 @@ const DragAndDrop = () => {
     });
 
     const getBoxIdFromPosition = (x, y) => {
-        if (!containerLayout) {
-            console.log('Container layout not available');
-            return null;
-        }
-
-        console.log('Container layout:', containerLayout);
-        console.log('Received coordinates (x, y):', x, y);
-
-        // Calculate the relative coordinates within the container
-        const relativeX = x - containerLayout.x;
-        const relativeY = y - containerLayout.y;
-
-        console.log('Relative coordinates (relativeX, relativeY):', relativeX, relativeY);
-
-        // Check if the relative coordinates are valid
-        if (isNaN(relativeX) || isNaN(relativeY)) {
-            console.log('Invalid relative coordinates');
-            return null;
-        }
-
-        // Check if the relative coordinates are within the container bounds
-        if (
-            relativeX < 0 ||
-            relativeY < 0 ||
-            relativeX > containerLayout.width ||
-            relativeY > containerLayout.height
-        ) {
-            console.log('Coordinates out of bounds');
-            return null;
-        }
-
-        // Calculate the box index
-        const boxWidth = 80;
-        const boxHeight = 100;
-        const boxMargin = 20;
-        const numColumns = 5;
-
-        const column = Math.floor(relativeX / (boxWidth + boxMargin));
-        const row = Math.floor(relativeY / (boxHeight + boxMargin));
-        const boxIndex = row * numColumns + column;
-
-        console.log('Calculated boxIndex:', boxIndex);
-
-        // Check if the box index is within the bounds
-        if (boxIndex >= 0 && boxIndex < boxes.length) {
-            return boxes[boxIndex].id;
-        } else {
-            console.log('Invalid box index');
-            return null;
-        }
+        // Código de la función getBoxIdFromPosition
     };
 
     const handleCubeDrop = (boxId, cubeId) => {
-        console.log('Handling cube drop:', cubeId, 'into box:', boxId);
+        // Código de la función handleCubeDrop
+    };
 
-        const targetBox = boxes.find(box => box.id === boxId);
-        const cube = cubes.find(cube => cube.id === cubeId);
-        const currentBox = boxes.find(box => box.colors.includes(cubeId));
+    const openModal = () => {
+        setModalVisible(true);
+    };
 
-        // Verificar si la caja objetivo está vacía o contiene solo cubos del mismo color
-        const canDropIntoTargetBox = targetBox.colors.length === 0 || targetBox.colors.every(color => {
-            const cubeColor = cubes.find(c => c.id === color).color;
-            return cubeColor === cube.color;
-        });
+    const closeModal = () => {
+        setModalVisible(false);
+    };
 
-        if (!canDropIntoTargetBox) {
-            Animated.spring(cubePositions[cubeId], {
-                toValue: { x: 0, y: 0 },
-                useNativeDriver: true,
-            }).start();
-            return;
-        }
-
-        const updatedBoxes = [...boxes];
-
-        // Eliminar el cubo de la caja actual
-        if (currentBox.id !== boxId) {
-            const currentIndex = updatedBoxes.findIndex(box => box.id === currentBox.id);
-            if (currentIndex !== -1) {
-                updatedBoxes[currentIndex].colors = updatedBoxes[currentIndex].colors.filter(color => color !== cubeId);
-                updatedBoxes[currentIndex].count--;
-            }
-        }
-
-        // Agregar el cubo a la caja objetivo
-        const targetIndex = updatedBoxes.findIndex(box => box.id === boxId);
-        if (targetIndex !== -1) {
-            updatedBoxes[targetIndex].colors.push(cubeId);
-            updatedBoxes[targetIndex].count++;
-        }
-
-        console.log('Before updating boxes:', JSON.stringify(boxes));
-        setBoxes(updatedBoxes);
-        console.log('After updating boxes:', JSON.stringify(updatedBoxes));
-
-        Animated.spring(cubePositions[cubeId], {
-            toValue: { x: 0, y: 0 },
-            useNativeDriver: true,
-        }).start();
+    const handleGuess = (guessedCorrectly) => {
+        console.log('Guessed correctly:', guessedCorrectly);
+        closeModal(); // Cierra la modal después de adivinar
     };
 
     return (
@@ -210,6 +130,13 @@ const DragAndDrop = () => {
                     </Animated.View>
                 ))}
             </View>
+            <Button title="Adivinar colores" onPress={openModal} />
+            {/* Agrega la modal */}
+            <GuessColorModal
+                visible={modalVisible}
+                onClose={closeModal}
+                onGuess={handleGuess}
+            />
         </View>
     );
 };

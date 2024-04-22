@@ -61,4 +61,28 @@ export const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    balanceContainer: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: '50%',
+        width: 2,
+        backgroundColor: '#000',
+        justifyContent: 'flex-end',
+    },
+    balance: {
+        position: 'absolute',
+        left: -5,
+        right: -5,
+        height: 2,
+        backgroundColor: '#000',
+    },
+    balancePivot: {
+        height: 20,
+        width: 20,
+        backgroundColor: '#FFD700',
+        borderRadius: 10,
+        alignSelf: 'center',
+    },
 });
+
