@@ -5,26 +5,24 @@ import { View, Text, Button, TextInput, Alert } from 'react-native'; // Importa 
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
-import { useCallback } from 'react';
-
 
 const BalancingScales = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [mensajes, setMensajes] = useState('');
     const [userInput, setUserInput] = useState(''); // Estado para almacenar la entrada del usuario
 
-    const addToLog = useCallback((message) => {
+    const addToLog = (message) => {
         setMensajes(prevMensajes => prevMensajes + message + '\n');
-    }, []);
+    };
 
-    const alert = (title, message, buttons = []) => {
-        Alert.alert(title, message, buttons);
+    const showAlert = (title, message, buttons) => {
+        console.log('message', message);
     };
 
     // Define possible weights of minerals
     const possibleWeights = Array.from({ length: 30 }, (_, i) => i + 1); // Weights between 1 and 30 grams
 
-    const generateMineralWeights = useCallback(() => {
+    const generateMineralWeights = () => {
         const weights = [];
         const mineralNames = [];
         const colors = ['red', 'yellow', 'green', 'blue', 'violet'];
@@ -39,9 +37,9 @@ const BalancingScales = () => {
         });
 
         return [weights, mineralNames];
-    }, [possibleWeights]);
+    };
 
-    const playRound = useCallback(() => {
+    const playRound = () => {
         const [mineralWeights, mineralNames] = generateMineralWeights();
         const mainScale = [[], []]; // [left_minerals, right_minerals]
         const remainingMinerals = { red: 2, yellow: 2, green: 2, blue: 2, violet: 2 };
@@ -53,8 +51,11 @@ const BalancingScales = () => {
         addToLog(`The weight of ${revealedColor} minerals is: ${revealedWeight} grams`);
 
         let isFirstTurn = true;
+        let roundOver = false;
+        let numIterations = 0;
+        const maxIterations = 100; // Definir un número máximo de iteraciones para evitar bucles infinitos
 
-        while (true) {
+        while (!roundOver && numIterations < maxIterations) {
             if (!isFirstTurn) {
                 addToLog('\nMain scale:');
                 addToLog('Left:', mainScale[0].join(', '));
@@ -79,7 +80,7 @@ const BalancingScales = () => {
                 addToLog(`${color.charAt(0).toUpperCase() + color.slice(1)}: ${quantity}`);
             }
 
-            const option = Alert.alert(
+            const option = showAlert(
                 'Options',
                 "Enter 'p' to place a mineral or 'g' to guess the weights:",
                 [
@@ -92,7 +93,7 @@ const BalancingScales = () => {
             switch (option) {
                 case 'p':
                     // Implementa la lógica para colocar un mineral
-                    const mineralColor = Alert.alert(
+                    const mineralColor = showAlert(
                         'Enter Mineral Color',
                         'Choose the color of the mineral you want to place:',
                         [
@@ -110,7 +111,7 @@ const BalancingScales = () => {
                         continue;
                     }
 
-                    const side = Alert.alert(
+                    const side = showAlert(
                         'Enter Side',
                         'Choose the side where you want to place the mineral:',
                         [
@@ -170,7 +171,7 @@ const BalancingScales = () => {
 
                     if (incorrectGuesses.length === 0) {
                         addToLog('Congratulations! You have correctly guessed all the weights.');
-                        return true;
+                        roundOver = true;
                     } else {
                         addToLog('Sorry, you failed to guess the weight of the following minerals:');
                         incorrectGuesses.forEach(color => console.log(color.charAt(0).toUpperCase() + color.slice(1)));
@@ -184,42 +185,47 @@ const BalancingScales = () => {
                                 printedColors.add(color);
                             }
                         }
-                        return false;
+                        roundOver = true;
                     }
+                    break;
+
                 default:
                     addToLog("Invalid option. Enter 'p' or 'g'.");
                     break;
             }
 
             isFirstTurn = false;
+            numIterations++;
         }
-    }, [generateMineralWeights, addToLog]);
 
+        if (numIterations >= maxIterations) {
+            addToLog('The maximum number of iterations has been reached.');
+        }
+    };
 
-
-    // eslint-disable-next-line no-unused-vars
-    const main = useCallback(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const main = () => {
         let playAgain = 'y';
         while (playAgain === 'y') {
             const result = playRound();
             if (result) {
                 addToLog('You won the round!');
             }
-            playAgain = alert('Do you want to play again? (y/n): ', '', [
+            playAgain = showAlert('Do you want to play again? (y/n): ', '', [
                 { text: 'Yes', onPress: () => { addToLog('playAgain'); return 'y'; } },
                 { text: 'No', onPress: () => 'n' },
             ]);
         }
         addToLog('Game over.');
-    }, [addToLog, playRound]);
+    };
 
     //Ejecuta la primer vez que abre la app
     //En teoria tiene que llamar a main(), y en el [] de abajo tiene que estar main, pero algo pasa con los alerts que sobre carga la aplicacion, la relentiza y la cierra
     //Entonces una propuesta es hacer los propios modales
     useEffect(() => {
-        console.log('Ejecutando useEffect');
-        addToLog('Welcome to Balancing Scales!');
-    }, [addToLog]);
+        main();
+    }); // La matriz de dependencias está vacía, por lo que se ejecutará solo una vez al montar el componente
+
 
     const openModal = () => {
         setModalVisible(true);
