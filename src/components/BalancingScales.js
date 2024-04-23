@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
+import { View, Text, Button, TextInput, Alert, TouchableNativeFeedback } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
@@ -10,13 +10,16 @@ const BalancingScales = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [mensajes, setMensajes] = useState('');
     const [userInput, setUserInput] = useState(''); // Estado para almacenar la entrada del usuario
+    var [isFirstTurn, setIsFirstTurn] = useState(true);
 
     const addToLog = (message) => {
         setMensajes(prevMensajes => prevMensajes + message + '\n');
     };
 
     const showAlert = (title, message, buttons) => {
-        console.log('message', message);
+        setTimeout(() => {
+            console.log('message', message);
+        }, 1000);
     };
 
     // Define possible weights of minerals
@@ -40,6 +43,9 @@ const BalancingScales = () => {
     };
 
     const playRound = () => {
+        console.log('Ejecutando main');
+
+        isFirstTurn = false;
         const [mineralWeights, mineralNames] = generateMineralWeights();
         const mainScale = [[], []]; // [left_minerals, right_minerals]
         const remainingMinerals = { red: 2, yellow: 2, green: 2, blue: 2, violet: 2 };
@@ -50,7 +56,6 @@ const BalancingScales = () => {
         const revealedColor = mineralNames[revealedMineralIndex].split(' ')[0].toLowerCase();
         addToLog(`The weight of ${revealedColor} minerals is: ${revealedWeight} grams`);
 
-        let isFirstTurn = true;
         let roundOver = false;
         let numIterations = 0;
         const maxIterations = 100; // Definir un número máximo de iteraciones para evitar bucles infinitos
@@ -223,8 +228,13 @@ const BalancingScales = () => {
     //En teoria tiene que llamar a main(), y en el [] de abajo tiene que estar main, pero algo pasa con los alerts que sobre carga la aplicacion, la relentiza y la cierra
     //Entonces una propuesta es hacer los propios modales
     useEffect(() => {
-        main();
-    }); // La matriz de dependencias está vacía, por lo que se ejecutará solo una vez al montar el componente
+        if (isFirstTurn) {
+            main();
+            setIsFirstTurn(false); // Cambia isFirstTurn después de que main() se ejecute una vez
+        }
+        console.log('isFirstTurn', isFirstTurn);
+    }, [isFirstTurn, main]);
+
 
 
     const openModal = () => {
