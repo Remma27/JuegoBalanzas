@@ -1,29 +1,43 @@
 /* eslint-disable prettier/prettier */
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, Alert, TouchableNativeFeedback } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
+import { View, Text, Button, TextInput, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
 import { ScrollView } from 'react-native';
 
+
+
 const BalancingScales = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [mensajes, setMensajes] = useState('');
     const [userInput, setUserInput] = useState(''); // Estado para almacenar la entrada del usuario
-    var [isFirstTurn, setIsFirstTurn] = useState(true);
+    const [isFirstTurn, setIsFirstTurn] = useState(true);
 
     const addToLog = (message) => {
         setMensajes(prevMensajes => prevMensajes + message + '\n');
+        console.log(message);
     };
 
     const showAlert = (title, message, buttons) => {
-        if (isFirstTurn === true) {
-            setTimeout(() => {
-                Alert.alert(title, message, buttons);
-            }, 1000);
-        }
-        setIsFirstTurn(true);
+        return new Promise((resolve) => {
+            Alert.alert(
+                title,
+                message,
+                buttons,
+                { cancelable: false }
+            );
+
+            const handleButtonPress = (value) => {
+                resolve(value);
+            };
+
+            // Asigna la función de manejo de la presión del botón a cada botón
+            buttons.forEach(button => {
+                button.onPress = () => handleButtonPress(button.text); // Resuelve la promesa con el texto del botón
+            });
+        });
     };
 
     // Define possible weights of minerals
@@ -46,8 +60,7 @@ const BalancingScales = () => {
         return [weights, mineralNames];
     };
 
-    const playRound = () => {
-        setIsFirstTurn(false);
+    const playRound = async () => {
         const [mineralWeights, mineralNames] = generateMineralWeights();
         const mainScale = [[], []]; // [left_minerals, right_minerals]
         const remainingMinerals = { red: 2, yellow: 2, green: 2, blue: 2, violet: 2 };
@@ -60,13 +73,15 @@ const BalancingScales = () => {
 
         let roundOver = false;
         let numIterations = 0;
-        const maxIterations = 100; // Definir un número máximo de iteraciones para evitar bucles infinitos
+        const maxIterations = 5; // Definir un número máximo de iteraciones para evitar bucles infinitos
 
         while (!roundOver && numIterations < maxIterations) {
             if (!isFirstTurn) {
                 addToLog('\nMain scale:');
                 addToLog('Left:', mainScale[0].join(', '));
                 addToLog('Right:', mainScale[1].join(', '));
+            } else {
+                setIsFirstTurn(false);
             }
 
             const leftWeight = mainScale[0].reduce((acc, mineral) => acc + mineralWeights[mineralNames.indexOf(mineral)], 0);
@@ -87,19 +102,24 @@ const BalancingScales = () => {
                 addToLog(`${color.charAt(0).toUpperCase() + color.slice(1)}: ${quantity}`);
             }
 
-            const option = showAlert(
-                'Options',
-                "Enter 'p' to place a mineral or 'g' to guess the weights:",
-                [
-                    { text: 'Place a mineral', onPress: () => 'p' },
-                    { text: 'Guess the weights', onPress: () => 'g' },
-                ],
-                { cancelable: false }
-            );
+            let option;
+            do {
+                option = await showAlert(
+                    'Options',
+                    "Enter 'p' to place a mineral or 'g' to guess the weights:",
+                    [
+                        { text: 'Place a mineral', onPress: () => { option = 'p'; } },
+                        { text: 'Guess the weights', onPress: () => { option = 'g'; } },
+                    ],
+                    { cancelable: false }
+                );
+            } while (option !== 'p' && option !== 'g');
+
+            console.log('Option:', option);
+
 
             switch (option) {
                 case 'p':
-                    // Implementa la lógica para colocar un mineral
                     const mineralColor = showAlert(
                         'Enter Mineral Color',
                         'Choose the color of the mineral you want to place:',
@@ -160,8 +180,11 @@ const BalancingScales = () => {
                         if (!(color in guesses)) {
                             let guess;
                             while (isNaN(guess) || guess === null) {
-                                guess = parseInt(Alert.alert(`Enter your estimation for the weight of ${color} minerals:`), 10);
-                                if (isNaN(guess)) {
+                                const input = showAlert(`Enter your estimation for the weight of ${color} minerals:`, '');
+                                const parsedInput = parseInt(input, 10);
+                                if (!isNaN(parsedInput)) {
+                                    guess = parsedInput;
+                                } else {
                                     addToLog('Error: Please enter a valid integer.');
                                 }
                             }
@@ -201,44 +224,43 @@ const BalancingScales = () => {
                     break;
             }
 
-            isFirstTurn = false;
             numIterations++;
         }
 
         if (numIterations >= maxIterations) {
             addToLog('The maximum number of iterations has been reached.');
         }
+
+        if (roundOver) {
+            resetGame();
+        }
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const main = () => {
-        setIsFirstTurn(false);
-        let playAgain = 'y';
-        while (playAgain === 'y') {
-            const result = playRound();
-            if (result) {
-                addToLog('You won the round!');
-            }
-            playAgain = showAlert('Do you want to play again? (y/n): ', '', [
-                { text: 'Yes', onPress: () => { addToLog('playAgain'); return 'y'; } },
-                { text: 'No', onPress: () => 'n' },
-            ]);
+    const resetGame = () => {
+        const playAgain = showAlert('Do you want to play again? (y/n): ', '', [
+            { text: 'Yes', onPress: () => { addToLog('playAgain'); return 'y'; } },
+            { text: 'No', onPress: () => 'n' },
+        ]);
+
+        if (playAgain === 'y') {
+            setIsFirstTurn(true);
+            main();
+        } else {
+            addToLog('Game over.');
         }
-        addToLog('Game over.');
     };
 
     //Ejecuta la primer vez que abre la app
     //En teoria tiene que llamar a main(), y en el [] de abajo tiene que estar main, pero algo pasa con los alerts que sobre carga la aplicacion, la relentiza y la cierra
     //Entonces una propuesta es hacer los propios modales
+    const main = () => {
+        playRound();
+    };
+
     useEffect(() => {
-        if (isFirstTurn === true) {
-            main();
-            setIsFirstTurn(false); // Cambia isFirstTurn después de que main() se ejecute una vez
-        }
-        console.log('isFirstTurn', isFirstTurn);
-    }, [isFirstTurn, main]);
-
-
+        main();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const openModal = () => {
         setModalVisible(true);
