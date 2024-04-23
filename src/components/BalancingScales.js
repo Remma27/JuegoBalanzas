@@ -5,6 +5,7 @@ import { View, Text, Button, TextInput, Alert, TouchableNativeFeedback } from 'r
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
+import { ScrollView } from 'react-native';
 
 const BalancingScales = () => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -17,9 +18,12 @@ const BalancingScales = () => {
     };
 
     const showAlert = (title, message, buttons) => {
-        setTimeout(() => {
-            console.log('message', message);
-        }, 1000);
+        if (isFirstTurn === true) {
+            setTimeout(() => {
+                Alert.alert(title, message, buttons);
+            }, 1000);
+        }
+        setIsFirstTurn(true);
     };
 
     // Define possible weights of minerals
@@ -43,9 +47,7 @@ const BalancingScales = () => {
     };
 
     const playRound = () => {
-        console.log('Ejecutando main');
-
-        isFirstTurn = false;
+        setIsFirstTurn(false);
         const [mineralWeights, mineralNames] = generateMineralWeights();
         const mainScale = [[], []]; // [left_minerals, right_minerals]
         const remainingMinerals = { red: 2, yellow: 2, green: 2, blue: 2, violet: 2 };
@@ -210,6 +212,7 @@ const BalancingScales = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const main = () => {
+        setIsFirstTurn(false);
         let playAgain = 'y';
         while (playAgain === 'y') {
             const result = playRound();
@@ -228,7 +231,7 @@ const BalancingScales = () => {
     //En teoria tiene que llamar a main(), y en el [] de abajo tiene que estar main, pero algo pasa con los alerts que sobre carga la aplicacion, la relentiza y la cierra
     //Entonces una propuesta es hacer los propios modales
     useEffect(() => {
-        if (isFirstTurn) {
+        if (isFirstTurn === true) {
             main();
             setIsFirstTurn(false); // Cambia isFirstTurn después de que main() se ejecute una vez
         }
@@ -253,14 +256,18 @@ const BalancingScales = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Balancing Scales</Text>
-            <Textarea
-                containerStyle={styles.textareaContainer}
-                style={styles.textarea}
-                value={mensajes}
-                editable={false}
-            />
+
+            <ScrollView style={styles.textareaContainer}>
+                <Textarea
+                    style={styles.textarea}
+                    value={mensajes}
+                    editable={false}
+                />
+            </ScrollView>
+
             <Button title="Adivinar colores" onPress={openModal} />
             <GuessColorModal visible={modalVisible} onClose={closeModal} onGuess={handleGuess} />
+
             {/* TextInput para obtener la entrada del usuario */}
             <TextInput
                 value={userInput} // Usa el estado userInput aquí
@@ -278,6 +285,7 @@ const BalancingScales = () => {
             />
         </View>
     );
+
 };
 
 export default BalancingScales;
