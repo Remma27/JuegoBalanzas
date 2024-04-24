@@ -20,25 +20,23 @@ const BalancingScales = () => {
         console.log(message);
     };
 
-    const showAlert = (title, message, buttons) => {
+    async function showAlert(title, message, buttons, options) {
         return new Promise((resolve) => {
             Alert.alert(
                 title,
                 message,
                 buttons,
-                { cancelable: false }
+                options
             );
-
-            const handleButtonPress = (value) => {
-                resolve(value);
+            const handlePress = (buttonIndex) => {
+                resolve(buttons[buttonIndex].onPress());
             };
-
-            // Asigna la función de manejo de la presión del botón a cada botón
-            buttons.forEach(button => {
-                button.onPress = () => handleButtonPress(button.text); // Resuelve la promesa con el texto del botón
-            });
+            Alert.alert(title, message, buttons, options, handlePress);
+            console.log('Alerta:', title, message, buttons, options);
+            console.log('Resolve:', resolve);
+            console.log('HandlePress:', handlePress);
         });
-    };
+    }
 
     // Define possible weights of minerals
     const possibleWeights = Array.from({ length: 30 }, (_, i) => i + 1); // Weights between 1 and 30 grams
@@ -113,6 +111,7 @@ const BalancingScales = () => {
                     ],
                     { cancelable: false }
                 );
+                console.log('Option:', option);
             } while (option !== 'p' && option !== 'g');
 
             console.log('Option:', option);
@@ -257,11 +256,6 @@ const BalancingScales = () => {
         playRound();
     };
 
-    useEffect(() => {
-        main();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const openModal = () => {
         setModalVisible(true);
     };
@@ -299,10 +293,12 @@ const BalancingScales = () => {
                 onChangeText={(newValue) => setUserInput(newValue)}
             />
             <Button
-                title="Enviar"
+                title="Iniciar juego"
                 onPress={() => {
-                    addToLog(userInput);
-                    setUserInput(''); // Limpia el estado userInput después de agregarlo a los mensajes
+
+                    main();
+                    //addToLog(userInput);
+                    //setUserInput(''); // Limpia el estado userInput después de agregarlo a los mensajes
                 }}
             />
         </View>
