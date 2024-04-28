@@ -12,6 +12,7 @@ const ColorInput = ({ color, value, onChangeText }) => (
     />
 );
 
+
 const getColor = (color) => {
     switch (color) {
         case 'red':
@@ -31,30 +32,28 @@ const getColor = (color) => {
 
 const GuessColorModal = ({ visible, onClose, onGuess }) => {
     const [colorValues, setColorValues] = useState({
-        red: '',
-        blue: '',
-        green: '',
-        yellow: '',
-        violet: '',
+        red: null,
+        blue: null,
+        green: null,
+        yellow: null,
+        violet: null,
     });
 
-    const correctAnswers = {
-        red: '1',
-        blue: '2',
-        green: '1',
-        yellow: '2',
-        violet: '1',
-    };
-
     const handleGuess = () => {
-        const guessedCorrectly = Object.entries(colorValues).every(
-            ([color, value]) => value === correctAnswers[color]
-        );
-        onGuess(guessedCorrectly);
+        // Verificar si todos los inputs tienen un valor
+        const allInputsFilled = Object.values(colorValues).every(value => value !== null);
+        if (!allInputsFilled) {
+            Alert.alert('Todos los campos son obligatorios', 'Por favor, complete todos los campos.');
+            return;
+        }
+
+        // Si todos los inputs son válidos, llamar a la función onGuess
+        const guessedValues = colorValues;
+        onGuess(guessedValues);
     };
 
     const handleColorValueChange = (color, value) => {
-        setColorValues((prevState) => ({ ...prevState, [color]: value }));
+        setColorValues((prevState) => ({ ...prevState, [color]: parseInt(value, 10) }));
     };
 
     return (
@@ -68,7 +67,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         <ColorInput
                             key={color}
                             color={color}
-                            value={colorValues[color]}
+                            value={colorValues[color] !== null ? String(colorValues[color]) : ''}
                             onChangeText={handleColorValueChange}
                         />
                     ))}
