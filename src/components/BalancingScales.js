@@ -1,31 +1,29 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useState, useRef } from 'react';
-// eslint-disable-next-line no-unused-vars
-import { View, Text, Button, TextInput, Alert } from 'react-native';
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, ScrollView, TextInput,TouchableOpacity } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
+import { styles } from '../css/styles';
+
 import MineralColorModal from './MineralColorModal';
-import { StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import { ViewPropTypes } from 'react-native'; // Importa ViewPropTypes
+
 
 const BalancingScales = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [mensajes, setMensajes] = useState('');
   const [isFirstTurn, setIsFirstTurn] = useState(true);
-  // eslint-disable-next-line no-unused-vars
   const [selectedColor, setSelectedColor] = useState(null);
   const [colorModalVisible, setColorModalVisible] = useState(false);
-  const scrollViewRef = useRef(null);
+
 
   const addToLog = message => {
     setMensajes(prevMensajes => prevMensajes + message + '\n');
     console.log(message);
-  };
-
-  // eslint-disable-next-line no-unused-vars
-  const scrollToEnd = () => {
-    scrollViewRef.current.scrollToEnd({ animated: true });
   };
 
   async function showAlert(title, message, buttons) {
@@ -127,7 +125,6 @@ const BalancingScales = () => {
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
   const guessWeights = async (mainScale, mineralNames, mineralWeights, remainingMinerals) => {
     if (mainScale[0].length !== mainScale[1].length) {
       addToLog('The scale is not balanced. You cannot guess the weights yet.');
@@ -144,7 +141,6 @@ const BalancingScales = () => {
         do {
           const input = await new Promise(resolve => {
             showAlert(`Enter your estimation for the weight of ${color} minerals:`, '')
-              // eslint-disable-next-line no-shadow
               .then(input => resolve(input.trim())); // Elimina los espacios en blanco del inicio y final
           });
           const parsedInput = parseInt(input, 10);
@@ -184,7 +180,6 @@ const BalancingScales = () => {
   };
 
 
-  // eslint-disable-next-line no-unused-vars
   const resetGame = () => {
     const playAgain = showAlert('Do you want to play again? (y/n): ', '', [
       {
@@ -220,7 +215,7 @@ const BalancingScales = () => {
   const handleColorSelect = async color => {
     setSelectedColor(color);
     addToLog(`Selected color: ${color}`);
-
+    
     // Mostrar la pregunta para elegir el lado
     const side = await new Promise(resolve => {
       showAlert(
@@ -233,12 +228,11 @@ const BalancingScales = () => {
         { cancelable: false },
       );
     });
-
+  
     // Llama a la función para colocar el mineral después de elegir el lado
-    // eslint-disable-next-line no-undef
     await placeMineral(remainingMinerals, mineralNames, mainScale, color, side);
   };
-
+  
 
   const openModal = () => {
     setModalVisible(true);
@@ -255,46 +249,33 @@ const BalancingScales = () => {
 
   useEffect(() => {
     main();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tit_01}>Balancing Scales</Text>
-
-      <View style={styles.textareaContainer}>
-        <Textarea
-          style={styles.textarea}
-          defaultValue={mensajes}
-          value={mensajes}
-          editable={false}
-          multiline={true}
-          numberOfLines={10}
-        />
-      </View>
-
-      <View style={styles.banda}>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={openModal}
-        >
-          <Text style={styles.btnText}>Adivinar Pesos</Text>
+      <Text style={styles.title}>Balancing Scales</Text>
+  
+      <ScrollView style={styles.textareaContainer} contentContainerStyle={styles.scrollViewContent}>
+        <TextInput style={styles.textarea} value={mensajes} editable={false} multiline={true} />
+      </ScrollView>
+  
+      <View style={styles.buttonContainer}>
+      <TouchableOpacity style={[styles.button, styles.rightButton]} onPress={openColorModal}>
+          <Text style={styles.buttonText}>Colocar cubos</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.btn, styles.btnColor]}
-          onPress={openColorModal}
-        >
-          <Text style={styles.btnText}>Seleccionar Color</Text>
+        <TouchableOpacity style={[styles.button1, styles.leftButton]} onPress={openModal}>
+          <Text style={styles.buttonText}>Adivinar pesos</Text>
         </TouchableOpacity>
+  
+        
       </View>
-
+  
       <GuessColorModal
         visible={modalVisible}
         onClose={closeModal}
         onGuess={handleGuess}
       />
-
+  
       {colorModalVisible && (
         <MineralColorModal
           visible={colorModalVisible}
@@ -304,59 +285,7 @@ const BalancingScales = () => {
       )}
     </View>
   );
-
+  
 };
-
-BalancingScales.propTypes = {
-  styles: ViewPropTypes.style,
-};
-
-const styles = StyleSheet.create({
-  tit_01: {
-    textAlign: 'center',
-    fontSize: 25,
-    marginVertical: 10,
-  },
-  banda: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  textareaContainer: {
-    padding: 5,
-    borderColor: '#355DA8',
-    borderWidth: 1,
-    flex: 1,
-  },
-  textarea: {
-    backgroundColor: '#FFFFFF',
-    color: '#000000',
-    textAlignVertical: 'top',
-    fontSize: 16,
-    padding: 5,
-    borderColor: '#355DA8',
-    borderWidth: 1,
-    flex: 1,
-  },
-  btn: {
-    backgroundColor: '#355DA8',
-    borderRadius: 5,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '45%',
-  },
-  btnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  btnColor: {
-    backgroundColor: '#FFD700', // Cambiar color del segundo botón si es necesario
-  },
-});
 
 export default BalancingScales;
