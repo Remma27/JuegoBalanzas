@@ -203,10 +203,41 @@ const BalancingScales = () => {
     setModalVisible(false);
   };
 
-  const handleGuess = guessedCorrectly => {
-    addToLog('Guessed correctly: ' + guessedCorrectly);
+  const handleGuess = (guessedWeights) => {
+    console.log('Guessed weights:', guessedWeights); // Verifica el valor de guessedWeights aquí
+
+    // Convertir guessedWeights en un objeto
+    const guessedWeightsObj = guessedWeights;
+
+    // Inicializar una variable para rastrear si todas las adivinanzas son correctas
+    let allCorrect = true;
+
+    // Iterar sobre las adivinanzas para cada mineral
+    for (const [color, weight] of Object.entries(guessedWeightsObj)) {
+      // Obtener la lista de minerales en el lado correspondiente
+      const minerals = mainScale[0].concat(mainScale[1]);
+
+      // Verificar si el mineral está en la lista
+      const mineralFound = minerals.find(mineral => mineral.toLowerCase().startsWith(color));
+
+      // Si el mineral no está en la lista o si el peso es incorrecto, marcar la adivinanza como incorrecta
+      if (!mineralFound || parseInt(mineralFound.split(' ')[2], 10) !== weight) {
+        allCorrect = false;
+        break; // No necesitamos seguir verificando si ya encontramos una adivinanza incorrecta
+      }
+    }
+
+    // Log the result
+    if (allCorrect) {
+      addToLog('¡Adivinaste correctamente!');
+    } else {
+      addToLog('Lo siento, una o más de tus adivinanzas son incorrectas.');
+    }
+
+    // Close the modal
     closeModal();
   };
+
 
   useEffect(() => {
     main();

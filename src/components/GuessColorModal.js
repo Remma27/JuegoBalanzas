@@ -22,48 +22,28 @@ const ColorInput = ({ color, value, onChangeText }) => {
 
 const GuessColorModal = ({ visible, onClose, onGuess }) => {
     const [colorValues, setColorValues] = useState({
-        red: '',
-        blue: '',
-        green: '',
-        yellow: '',
-        violet: '',
+        red: null,
+        blue: null,
+        green: null,
+        yellow: null,
+        violet: null,
     });
-
-    useEffect(() => {
-        if (!visible) {
-            // Limpiar los valores de los inputs cuando se cierre la modal
-            setColorValues({
-                red: '',
-                blue: '',
-                green: '',
-                yellow: '',
-                violet: '',
-            });
-        }
-    }, [visible]);
 
     const handleGuess = () => {
         // Verificar si todos los inputs tienen un valor
-        const allInputsFilled = Object.values(colorValues).every(value => value.trim() !== '');
+        const allInputsFilled = Object.values(colorValues).every(value => value !== null);
         if (!allInputsFilled) {
             Alert.alert('Todos los campos son obligatorios', 'Por favor, complete todos los campos.');
             return;
         }
 
-        // Verificar si todos los inputs contienen números válidos entre 1 y 30
-        const isValidNumber = Object.values(colorValues).every(value => /^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 30);
-        if (!isValidNumber) {
-            Alert.alert('Números inválidos', 'Por favor, ingrese números válidos entre 1 y 30 en todos los campos.');
-            return;
-        }
-
         // Si todos los inputs son válidos, llamar a la función onGuess
-        const guessedValues = Object.values(colorValues);
+        const guessedValues = colorValues;
         onGuess(guessedValues);
     };
 
     const handleColorValueChange = (color, value) => {
-        setColorValues((prevState) => ({ ...prevState, [color]: value }));
+        setColorValues((prevState) => ({ ...prevState, [color]: parseInt(value, 10) }));
     };
 
     return (
@@ -77,7 +57,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         <ColorInput
                             key={color}
                             color={color}
-                            value={colorValues[color]}
+                            value={colorValues[color] !== null ? String(colorValues[color]) : ''}
                             onChangeText={handleColorValueChange}
                         />
                     ))}
@@ -100,7 +80,6 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         </Modal>
     );
 };
-
 
 const guessStyles = StyleSheet.create({
     centeredView: {
