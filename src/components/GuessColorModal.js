@@ -1,6 +1,8 @@
+/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native';
+import { Alert } from 'react-native';
 
 const ColorInput = ({ color, value, onChangeText }) => (
     <TextInput
@@ -11,7 +13,6 @@ const ColorInput = ({ color, value, onChangeText }) => (
         style={[guessStyles.input, { backgroundColor: getColor(color) }]}
     />
 );
-
 
 const getColor = (color) => {
     switch (color) {
@@ -60,6 +61,9 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         <Modal visible={visible} animationType="slide" transparent>
             <View style={guessStyles.centeredView}>
                 <View style={guessStyles.modalView}>
+                    <TouchableOpacity style={guessStyles.closeButton} onPress={onClose}>
+                        <Text style={guessStyles.closeButtonText}>X</Text>
+                    </TouchableOpacity>
                     <Text style={guessStyles.modalText}>
                         Ingresa el número correspondiente a cada color:
                     </Text>
@@ -77,12 +81,6 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                             onPress={handleGuess}
                         >
                             <Text style={guessStyles.buttonText}>Adivinar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[guessStyles.button, guessStyles.closeButton]}
-                            onPress={onClose}
-                        >
-                            <Text style={guessStyles.buttonText}>Cerrar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -139,7 +137,19 @@ const guessStyles = StyleSheet.create({
         backgroundColor: '#2196F3',
     },
     closeButton: {
-        backgroundColor: '#FF6347', // Color rojo para cerrar
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'red',
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
     buttonText: {
         color: 'white',

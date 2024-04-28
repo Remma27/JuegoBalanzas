@@ -5,14 +5,11 @@
 
 
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Button, ScrollView, TextInput,TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
-import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
 import MineralColorModal from './MineralColorModal';
-import { StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import { ViewPropTypes } from 'react-native';
+
 
 const BalancingScales = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -20,7 +17,6 @@ const BalancingScales = () => {
   const [isFirstTurn, setIsFirstTurn] = useState(true);
   const [selectedColor, setSelectedColor] = useState(null);
   const [colorModalVisible, setColorModalVisible] = useState(false);
-  const [initialInfoPrinted, setInitialInfoPrinted] = useState(false);
   const [mainScale, setMainScale] = useState([[], []]); // [left_minerals, right_minerals]
   const [remainingMinerals, setRemainingMinerals] = useState({ red: 2, yellow: 2, green: 2, blue: 2, violet: 2 });
 
@@ -182,27 +178,6 @@ const BalancingScales = () => {
     });
   };
 
-
-  const resetGame = () => {
-    const playAgain = showAlert('Do you want to play again? (y/n): ', '', [
-      {
-        text: 'Yes',
-        onPress: () => {
-          addToLog('playAgain');
-          return 'y';
-        },
-      },
-      { text: 'No', onPress: () => 'n' },
-    ]);
-
-    if (playAgain === 'y') {
-      setIsFirstTurn(true);
-      main();
-    } else {
-      addToLog('Game over.');
-    }
-  };
-
   const main = () => {
     playRound();
   };
@@ -273,29 +248,29 @@ const BalancingScales = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balancing Scales</Text>
-  
+
       <ScrollView style={styles.textareaContainer} contentContainerStyle={styles.scrollViewContent}>
         <TextInput style={styles.textarea} value={mensajes} editable={false} multiline={true} />
       </ScrollView>
-  
+
       <View style={styles.buttonContainer}>
-      <TouchableOpacity style={[styles.button, styles.rightButton]} onPress={openColorModal}>
+        <TouchableOpacity style={[styles.button, styles.rightButton]} onPress={openColorModal}>
           <Text style={styles.buttonText}>Colocar cubos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button1, styles.leftButton]} onPress={openModal}>
           <Text style={styles.buttonText}>Adivinar pesos</Text>
 
         </TouchableOpacity>
-  
-        
+
+
       </View>
-  
+
       <GuessColorModal
         visible={modalVisible}
         onClose={closeModal}
         onGuess={handleGuess}
       />
-  
+
       {colorModalVisible && (
         <MineralColorModal
           visible={colorModalVisible}
@@ -305,7 +280,7 @@ const BalancingScales = () => {
       )}
     </View>
   );
-  
+
 };
 
 export default BalancingScales;
