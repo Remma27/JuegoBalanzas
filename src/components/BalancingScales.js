@@ -212,11 +212,27 @@ const BalancingScales = () => {
     setColorModalVisible(false);
   };
 
-  const handleColorSelect = color => {
+  const handleColorSelect = async color => {
     setSelectedColor(color);
-    addToLog('Selected color: ' + color);
-    closeColorModal();
+    addToLog(`Selected color: ${color}`);
+    
+    // Mostrar la pregunta para elegir el lado
+    const side = await new Promise(resolve => {
+      showAlert(
+        'Enter Side',
+        'Choose the side where you want to place the mineral:',
+        [
+          { text: 'Left', onPress: () => resolve('l') },
+          { text: 'Right', onPress: () => resolve('r') },
+        ],
+        { cancelable: false },
+      );
+    });
+  
+    // Llama a la función para colocar el mineral después de elegir el lado
+    await placeMineral(remainingMinerals, mineralNames, mainScale, color, side);
   };
+  
 
   const openModal = () => {
     setModalVisible(true);
