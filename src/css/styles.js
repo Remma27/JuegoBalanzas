@@ -121,5 +121,11 @@ export const styles = StyleSheet.create({
         height: 40,
         paddingTop: 10,
     },
+    button: {
+        backgroundColor: '#355DA8',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 10,
+    },
 });
 

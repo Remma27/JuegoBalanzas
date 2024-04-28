@@ -1,19 +1,24 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 
-import React, {useEffect, useState} from 'react';
-import {View, Text, Button, TextInput, Alert} from 'react-native'; // Importa TextInput para obtener la entrada del usuario
+
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, TextInput, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
-import {styles} from '../css/styles';
-import {ScrollView} from 'react-native';
+import { styles } from '../css/styles';
+import { ScrollView } from 'react-native';
+import MineralColorModal from './MineralColorModal';
 
 
 const BalancingScales = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [mensajes, setMensajes] = useState('');
-  const [userInput, setUserInput] = useState(''); // Estado para almacenar la entrada del usuario
   const [isFirstTurn, setIsFirstTurn] = useState(true);
-  const [guessing, setGuessing] = useState(false); // Estado para controlar si se está adivinando
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [colorModalVisible, setColorModalVisible] = useState(false);
 
 
   const addToLog = message => {
@@ -23,13 +28,13 @@ const BalancingScales = () => {
 
   async function showAlert(title, message, buttons) {
     return new Promise(resolve => {
-      Alert.alert(title, message, buttons, {cancelable: false});
+      Alert.alert(title, message, buttons, { cancelable: false });
       resolve();
     });
   }
 
   // Define possible weights of minerals
-  const possibleWeights = Array.from({length: 30}, (_, i) => i + 1); // Weights between 1 and 30 grams
+  const possibleWeights = Array.from({ length: 30 }, (_, i) => i + 1); // Weights between 1 and 30 grams
 
   const generateMineralWeights = () => {
     const weights = [];
@@ -53,197 +58,127 @@ const BalancingScales = () => {
     const [mineralWeights, mineralNames] = generateMineralWeights();
     const mainScale = [[], []]; // [left_minerals, right_minerals]
     const remainingMinerals = { red: 2, yellow: 2, green: 2, blue: 2, violet: 2 };
-  
+
     // Reveal weight of a random mineral
     const revealedMineralIndex = Math.floor(Math.random() * 10);
     const revealedWeight = mineralWeights[revealedMineralIndex];
     const revealedColor = mineralNames[revealedMineralIndex].split(' ')[0].toLowerCase();
     addToLog(`The weight of ${revealedColor} minerals is: ${revealedWeight} grams`);
-    const main = async () => {
-        if (guessing) {
-          await playRound(); // Solo llamamos a playRound si estamos adivinando
-        }
-      };
-    let roundOver = false;
-    let numIterations = 0;
-    const maxIterations = 5; // Definir un número máximo de iteraciones para evitar bucles infinitos
-  
-    while (!roundOver && numIterations < maxIterations) {
-      if (!isFirstTurn) {
-        addToLog('\nMain scale:');
-        addToLog('Left:', mainScale[0].join(', '));
-        addToLog('Right:', mainScale[1].join(', '));
+
+    if (!isFirstTurn) {
+      addToLog('\nMain scale:');
+      addToLog('Left:', mainScale[0].join(', '));
+      addToLog('Right:', mainScale[1].join(', '));
+    } else {
+      setIsFirstTurn(false);
+    }
+
+    const leftWeight = mainScale[0].reduce((acc, mineral) => acc + mineralWeights[mineralNames.indexOf(mineral)], 0);
+    const rightWeight = mainScale[1].reduce((acc, mineral) => acc + mineralWeights[mineralNames.indexOf(mineral)], 0);
+
+    if (!isFirstTurn) {
+      if (leftWeight > rightWeight) {
+        addToLog('The left side is heavier.');
+      } else if (leftWeight < rightWeight) {
+        addToLog('The right side is heavier.');
       } else {
-        setIsFirstTurn(false);
+        addToLog('The scale is balanced.');
       }
-  
-      const leftWeight = mainScale[0].reduce((acc, mineral) => acc + mineralWeights[mineralNames.indexOf(mineral)], 0);
-      const rightWeight = mainScale[1].reduce((acc, mineral) => acc + mineralWeights[mineralNames.indexOf(mineral)], 0);
-  
-      if (!isFirstTurn) {
-        if (leftWeight > rightWeight) {
-          addToLog('The left side is heavier.');
-        } else if (leftWeight < rightWeight) {
-          addToLog('The right side is heavier.');
-        } else {
-          addToLog('The scale is balanced.');
-        }
-      }
-  
-      addToLog('\nRemaining minerals:');
-      for (const [color, quantity] of Object.entries(remainingMinerals)) {
-        addToLog(`${color.charAt(0).toUpperCase() + color.slice(1)}: ${quantity}`);
-      }
-  
-      let option;
-      do {
-        option = await new Promise(resolve => {
-          showAlert(
-            'Options',
-            "Enter 'p' to place a mineral or 'g' to guess the weights:",
-            [
-              { text: 'Place a mineral', onPress: () => resolve('p') },
-              { text: 'Guess the weights', onPress: () => resolve('g') },
-            ],
-            { cancelable: false },
-          );
-        });
-      } while (option !== 'p' && option !== 'g');
-  
-      console.log('Option:', option);
-  
-      switch (option) {
-        case 'p':
-          const mineralColor = await new Promise(resolve => {
-            showAlert(
-              'Enter Mineral Color',
-              'Choose the color of the mineral you want to place:',
-              [
-                { text: 'Red', onPress: () => resolve('red') },
-                { text: 'Yellow', onPress: () => resolve('yellow') },
-                { text: 'Green', onPress: () => resolve('green') },
-                { text: 'Blue', onPress: () => resolve('blue') },
-                { text: 'Violet', onPress: () => resolve('violet') },
-              ],
-              { cancelable: false },
-            );
-          });
-  
-          if (!(mineralColor in remainingMinerals) || remainingMinerals[mineralColor] === 0) {
-            addToLog('There are no minerals available in that color.');
-            break; // Salir del switch statement después de manejar el error
-          }
-  
-          const side = await new Promise(resolve => {
-            showAlert(
-              'Enter Side',
-              'Choose the side where you want to place the mineral:',
-              [
-                { text: 'Left', onPress: () => resolve('l') },
-                { text: 'Right', onPress: () => resolve('r') },
-              ],
-              { cancelable: false },
-            );
-          });
-  
-          if (side !== 'l' && side !== 'r') {
-            addToLog("Invalid side. Enter 'l' for left or 'r' for right.");
-            break; // Salir del switch statement después de manejar el error
-          }
-  
-          const placedMineralIndex = mineralNames.findIndex(mineral => mineral.toLowerCase().includes(mineralColor) && !mainScale[0].includes(mineral) && !mainScale[1].includes(mineral));
-          if (placedMineralIndex !== -1) {
-            const placedMineral = mineralNames[placedMineralIndex];
-            remainingMinerals[mineralColor]--;
-            if (side === 'l') {
-              mainScale[0].push(placedMineral);
-            } else {
-              mainScale[1].push(placedMineral);
-            }
-          }
-          break;
-  
-          case 'g':
-            // Implementa la lógica para adivinar los pesos
-            // Aqui hay que llamar a la modal , jalar los datos a la modal y regresar el resultado
-            setGuessing(true); // Establecer la bandera para indicar que estamos adivinando
-            openModal(); // Abrir la modal
-            roundOver = true; // Salir del bucle
-          
-            console.log("Entrando g");
-          
-            if (mainScale[0].length !== mainScale[1].length) {
-              addToLog('The scale is not balanced. You cannot guess the weights yet.');
-              continue;
-            }
-          
-            const guesses = {};
-            const incorrectGuesses = [];
-            for (let i = 0; i < 10; i++) {
-              const color = mineralNames[i].split(' ')[0].toLowerCase();
-              if (!(color in guesses)) {
-                let guess;
-                do {
-                  const input = await new Promise(resolve => {
-                    showAlert(`Enter your estimation for the weight of ${color} minerals:`, '')
-                      .then(input => resolve(input.trim())); // Elimina los espacios en blanco del inicio y final
-                  });
-                  const parsedInput = parseInt(input, 10);
-                  if (!isNaN(parsedInput)) {
-                    guess = parsedInput;
-                  } else {
-                    addToLog('Error: Please enter a valid integer.');
-                  }
-                } while (isNaN(guess) || guess === null); // Continuar solicitando la entrada hasta que sea un número entero válido
-                guesses[color] = guess;
-              }
-            }
-          
-            // Compare guessed weights with the actual ones
-            for (const [color, guessedWeight] of Object.entries(guesses)) {
-              if (guessedWeight !== mineralWeights[mineralNames.indexOf(`${color.charAt(0).toUpperCase() + color.slice(1)} 1`)]) {
-                incorrectGuesses.push(color);
-              }
-            }
-          
-            if (incorrectGuesses.length === 0) {
-              addToLog('Congratulations! You have correctly guessed all the weights.');
-              roundOver = true;
-            } else {
-              addToLog('Sorry, you failed to guess the weight of the following minerals:');
-              incorrectGuesses.forEach(color => console.log(color.charAt(0).toUpperCase() + color.slice(1)));
-              addToLog('You lost the round.');
-              addToLog('The real weights of the minerals are:');
-              const printedColors = new Set();
-              for (let i = 0; i < mineralNames.length; i++) {
-                const color = mineralNames[i].split(' ')[0].toLowerCase();
-                if (color in remainingMinerals && !printedColors.has(color)) {
-                  addToLog(`The ${color} minerals weigh: ${mineralWeights[i]} grams`);
-                  printedColors.add(color);
-                }
-              }
-              roundOver = true;
-            }
-            break;
-          
-  
-        default:
-          addToLog("Invalid option. Enter 'p' or 'g'.");
-          break;
-      }
-  
-      numIterations++;
     }
-  
-    if (numIterations >= maxIterations) {
-      addToLog('The maximum number of iterations has been reached.');
-    }
-  
-    if (roundOver) {
-      resetGame();
+
+    addToLog('\nRemaining minerals:');
+    for (const [color, quantity] of Object.entries(remainingMinerals)) {
+      addToLog(`${color.charAt(0).toUpperCase() + color.slice(1)}: ${quantity}`);
     }
   };
-  
+
+  const placeMineral = async (remainingMinerals, mineralNames, mainScale, mineralSelected) => {
+
+    const side = await new Promise(resolve => {
+      showAlert(
+        'Enter Side',
+        'Choose the side where you want to place the mineral:',
+        [
+          { text: 'Left', onPress: () => resolve('l') },
+          { text: 'Right', onPress: () => resolve('r') },
+        ],
+        { cancelable: false },
+      );
+    });
+
+    if (side !== 'l' && side !== 'r') {
+      addToLog("Invalid side. Enter 'l' for left or 'r' for right.");
+      return;
+    }
+
+    const placedMineralIndex = mineralNames.findIndex(mineral => mineral.toLowerCase().startsWith(mineralSelected) && !mainScale[0].includes(mineral) && !mainScale[1].includes(mineral));
+    if (placedMineralIndex !== -1) {
+      const placedMineral = mineralNames[placedMineralIndex];
+      remainingMinerals[mineralSelected]--;
+      if (side === 'l') {
+        mainScale[0].push(placedMineral);
+      } else {
+        mainScale[1].push(placedMineral);
+      }
+    } else {
+      addToLog(`No mineral found with the color ${mineralSelected}.`);
+    }
+  };
+
+  const guessWeights = async (mainScale, mineralNames, mineralWeights, remainingMinerals) => {
+    if (mainScale[0].length !== mainScale[1].length) {
+      addToLog('The scale is not balanced. You cannot guess the weights yet.');
+      return;
+    }
+
+    const guesses = {};
+    const incorrectGuesses = [];
+
+    for (let i = 0; i < mineralNames.length; i++) {
+      const color = mineralNames[i].split(' ')[0].toLowerCase();
+      if (!guesses[color]) {
+        let guess;
+        do {
+          const input = await new Promise(resolve => {
+            showAlert(`Enter your estimation for the weight of ${color} minerals:`, '')
+              .then(input => resolve(input.trim())); // Elimina los espacios en blanco del inicio y final
+          });
+          const parsedInput = parseInt(input, 10);
+          if (!isNaN(parsedInput)) {
+            guess = parsedInput;
+          } else {
+            addToLog('Error: Please enter a valid integer.');
+          }
+        } while (isNaN(guess) || guess === null); // Continuar solicitando la entrada hasta que sea un número entero válido
+        guesses[color] = guess;
+      }
+    }
+
+    // Compare guessed weights with the actual ones
+    for (const [color, guessedWeight] of Object.entries(guesses)) {
+      if (guessedWeight !== mineralWeights[mineralNames.indexOf(`${color.charAt(0).toUpperCase() + color.slice(1)} 1`)]) {
+        incorrectGuesses.push(color);
+      }
+    }
+
+    if (incorrectGuesses.length === 0) {
+      addToLog('Congratulations! You have correctly guessed all the weights.');
+    } else {
+      addToLog('Sorry, you failed to guess the weight of the following minerals:');
+      incorrectGuesses.forEach(color => addToLog(color.charAt(0).toUpperCase() + color.slice(1)));
+      addToLog('You lost the round.');
+      addToLog('The real weights of the minerals are:');
+      const printedColors = new Set();
+      for (let i = 0; i < mineralNames.length; i++) {
+        const color = mineralNames[i].split(' ')[0].toLowerCase();
+        if (remainingMinerals[color] && !printedColors.has(color)) {
+          addToLog(`The ${color} minerals weigh: ${mineralWeights[i]} grams`);
+          printedColors.add(color);
+        }
+      }
+    }
+  };
+
 
   const resetGame = () => {
     const playAgain = showAlert('Do you want to play again? (y/n): ', '', [
@@ -254,7 +189,7 @@ const BalancingScales = () => {
           return 'y';
         },
       },
-      {text: 'No', onPress: () => 'n'},
+      { text: 'No', onPress: () => 'n' },
     ]);
 
     if (playAgain === 'y') {
@@ -265,11 +200,22 @@ const BalancingScales = () => {
     }
   };
 
-  //Ejecuta la primer vez que abre la app
-  //En teoria tiene que llamar a main(), y en el [] de abajo tiene que estar main, pero algo pasa con los alerts que sobre carga la aplicacion, la relentiza y la cierra
-  //Entonces una propuesta es hacer los propios modales
   const main = () => {
     playRound();
+  };
+
+  const openColorModal = () => {
+    setColorModalVisible(true);
+  };
+
+  const closeColorModal = () => {
+    setColorModalVisible(false);
+  };
+
+  const handleColorSelect = color => {
+    setSelectedColor(color);
+    addToLog('Selected color: ' + color);
+    closeColorModal();
   };
 
   const openModal = () => {
@@ -285,6 +231,10 @@ const BalancingScales = () => {
     closeModal();
   };
 
+  useEffect(() => {
+    main();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balancing Scales</Text>
@@ -293,35 +243,24 @@ const BalancingScales = () => {
         <Textarea style={styles.textarea} value={mensajes} editable={false} />
       </ScrollView>
 
-      {/* Botón para abrir la modal */}
-      <Button title="Adivinar colores" onPress={openModal} />
+      <Button style={styles.button} title="Adivinar pesos" onPress={openModal} />
+      <Button style={styles.button} title="Colocar cubos" onPress={openColorModal} />
 
-      {/* Modal */}
       <GuessColorModal
         visible={modalVisible}
         onClose={closeModal}
         onGuess={handleGuess}
       />
 
-      {/* TextInput para obtener la entrada del usuario */}
-      <TextInput
-        value={userInput}
-        style={styles.texto}
-        multiline={true}
-        placeholder="Escribe aquí..."
-        onChangeText={(newValue) => setUserInput(newValue)}
-      />
-      <Button
-        title="Iniciar juego"
-        onPress={() => {
-          main();
-          //addToLog(userInput);
-          //setUserInput(''); // Limpia el estado userInput después de agregarlo a los mensajes
-        }}
-      />
+      {colorModalVisible && (
+        <MineralColorModal
+          visible={colorModalVisible}
+          onClose={closeColorModal}
+          onSelectColor={handleColorSelect}
+        />
+      )}
     </View>
   );
-  
 };
 
 export default BalancingScales;
