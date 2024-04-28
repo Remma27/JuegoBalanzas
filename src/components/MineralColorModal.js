@@ -1,9 +1,12 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
-import { Modal, Text, View, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, Text, View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
 const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
     const colors = ['Red', 'Yellow', 'Green', 'Blue', 'Violet'];
+    const buttonColors = ['#FF5733', '#FFC300', '#28B463', '#3498DB', '#9B59B6'];
+    const screenWidth = Dimensions.get('window').width;
+    const buttonWidth = (screenWidth - 80) / colors.length; // Calcular el ancho de los botones
 
     const handleColorSelect = (color) => {
         onSelectColor(color);
@@ -20,13 +23,13 @@ const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>Choose the color of the mineral:</Text>
-                    {colors.map((color) => (
+                    {colors.map((color, index) => (
                         <TouchableOpacity
                             key={color}
-                            style={styles.colorButton}
+                            style={[styles.colorButton, { width: buttonWidth, backgroundColor: buttonColors[index] }]} // Establecer el ancho y color del botón
                             onPress={() => handleColorSelect(color)}
                         >
-                            <Text>{color}</Text>
+                            <Text style={styles.buttonText}>{color}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -62,10 +65,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     colorButton: {
-        backgroundColor: '#DDDDDD',
         padding: 10,
         marginBottom: 10,
         borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 

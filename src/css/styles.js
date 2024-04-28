@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,11 +11,7 @@ export const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333', // Cambia el color del título
-        marginBottom: 30, // Agrega espacio después del título
-        textShadowColor: '#aaa', // Agrega sombra al texto
-        textShadowOffset: { width: 1, height: 1 }, // Ajusta la sombra
-        textShadowRadius: 2, // Ajusta la sombra
+        textAlign: 'center', // Alineación centrada del texto
     },
     boxContainer: {
         flexDirection: 'row',
@@ -90,8 +85,8 @@ export const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     textareaContainer: {
+        flex: 1,
         padding: 10,
-        height: '30%',
         borderColor: '#355DA8',
         borderWidth: 1,
         marginBottom: 10,
@@ -99,12 +94,11 @@ export const styles = StyleSheet.create({
     textarea: {
         backgroundColor: '#FFFFFF',
         color: '#000000',
-        textAlignVertical: 'top',
-        height: '100%',
         fontSize: 16,
         padding: 5,
         borderColor: '#355DA8',
         borderWidth: 1,
+        minHeight: 100, // Altura mínima del área de texto
     },
     input: {
         height: 40,
@@ -122,15 +116,35 @@ export const styles = StyleSheet.create({
     },
     btnEnviar: {
         backgroundColor: '#355DA8',
-        marginTop: 5,
+        marginTop: 20, // Aumentando la separación desde la parte superior
         height: 40,
         paddingTop: 10,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center', // Alineación horizontal al centro
+        alignItems: 'flex-start', // Alineación vertical al inicio
+        width: '70%',
+        paddingHorizontal: 20,
+        marginTop: 0, // Modifica este valor según lo necesites
+    },
     button: {
-        backgroundColor: '#355DA8',
-        padding: 10,
+        backgroundColor: '#FFD700', // Color amarillo para el botón "Adivinar pesos"
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderRadius: 5,
-        marginBottom: 10,
+        marginHorizontal: 5, // Margen horizontal entre botones
+    },
+    button1: {
+        backgroundColor: 'blue', // Color azul para el botón "Colocar cubos"
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 5, // Margen horizontal entre botones
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center', // Alineación centrada del texto del botón
     },
 });
-

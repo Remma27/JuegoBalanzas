@@ -1,8 +1,14 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Button, ScrollView, TextInput,TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
+import { styles } from '../css/styles';
 import MineralColorModal from './MineralColorModal';
 import { StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native';
@@ -177,6 +183,26 @@ const BalancingScales = () => {
   };
 
 
+  const resetGame = () => {
+    const playAgain = showAlert('Do you want to play again? (y/n): ', '', [
+      {
+        text: 'Yes',
+        onPress: () => {
+          addToLog('playAgain');
+          return 'y';
+        },
+      },
+      { text: 'No', onPress: () => 'n' },
+    ]);
+
+    if (playAgain === 'y') {
+      setIsFirstTurn(true);
+      main();
+    } else {
+      addToLog('Game over.');
+    }
+  };
+
   const main = () => {
     playRound();
   };
@@ -192,6 +218,7 @@ const BalancingScales = () => {
   const handleColorSelect = async (color) => {
     setSelectedColor(color); // Actualizar el estado de selectedColor
     addToLog(`Selected color: ${color}`);
+
     await placeMineral(color); // Llamar a placeMineral después de actualizar selectedColor
   };
 
@@ -241,46 +268,34 @@ const BalancingScales = () => {
 
   useEffect(() => {
     main();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tit_01}>Balancing Scales</Text>
-
-      <View style={styles.textareaContainer}>
-        <Textarea
-          style={styles.textarea}
-          defaultValue={mensajes}
-          value={mensajes}
-          editable={false}
-          multiline={true}
-          numberOfLines={10}
-        />
-      </View>
-
-      <View style={styles.banda}>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={openModal}
-        >
-          <Text style={styles.btnText}>Adivinar Pesos</Text>
+      <Text style={styles.title}>Balancing Scales</Text>
+  
+      <ScrollView style={styles.textareaContainer} contentContainerStyle={styles.scrollViewContent}>
+        <TextInput style={styles.textarea} value={mensajes} editable={false} multiline={true} />
+      </ScrollView>
+  
+      <View style={styles.buttonContainer}>
+      <TouchableOpacity style={[styles.button, styles.rightButton]} onPress={openColorModal}>
+          <Text style={styles.buttonText}>Colocar cubos</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.button1, styles.leftButton]} onPress={openModal}>
+          <Text style={styles.buttonText}>Adivinar pesos</Text>
 
-        <TouchableOpacity
-          style={[styles.btn, styles.btnColor]}
-          onPress={openColorModal}
-        >
-          <Text style={styles.btnText}>Colocar cubo</Text>
         </TouchableOpacity>
+  
+        
       </View>
-
+  
       <GuessColorModal
         visible={modalVisible}
         onClose={closeModal}
         onGuess={handleGuess}
       />
-
+  
       {colorModalVisible && (
         <MineralColorModal
           visible={colorModalVisible}
@@ -290,59 +305,7 @@ const BalancingScales = () => {
       )}
     </View>
   );
-
+  
 };
-
-BalancingScales.propTypes = {
-  styles: ViewPropTypes.style,
-};
-
-const styles = StyleSheet.create({
-  tit_01: {
-    textAlign: 'center',
-    fontSize: 25,
-    marginVertical: 10,
-  },
-  banda: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  textareaContainer: {
-    padding: 5,
-    borderColor: '#355DA8',
-    borderWidth: 1,
-    flex: 1,
-  },
-  textarea: {
-    backgroundColor: '#FFFFFF',
-    color: '#000000',
-    textAlignVertical: 'top',
-    fontSize: 16,
-    padding: 5,
-    borderColor: '#355DA8',
-    borderWidth: 1,
-    flex: 1,
-  },
-  btn: {
-    backgroundColor: '#355DA8',
-    borderRadius: 5,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '45%',
-  },
-  btnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  btnColor: {
-    backgroundColor: '#FFD700', // Cambiar color del segundo botón si es necesario
-  },
-});
 
 export default BalancingScales;
