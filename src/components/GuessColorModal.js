@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput } from 'react-native';
+/* eslint-disable prettier/prettier */
+import React, { useState, useEffect } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 
-const ColorInput = ({ color, value, onChangeText }) => (
-    <TextInput
-        placeholder={color.charAt(0).toUpperCase() + color.slice(1)}
-        onChangeText={(text) => onChangeText(color, text)}
-        value={value}
-        keyboardType="numeric"
-        style={[guessStyles.input, { backgroundColor: getColor(color) }]}
-    />
-);
+const ColorInput = ({ color, value, onChangeText }) => {
+    const handleChangeText = (text) => {
+        if (/^\d+$/.test(text) && parseInt(text, 10) >= 1 && parseInt(text, 10) <= 30) {
+            onChangeText(color, text);
+        }
+    };
+
+    return (
+        <TextInput
+            placeholder={color.charAt(0).toUpperCase() + color.slice(1)}
+            onChangeText={handleChangeText}
+            value={value}
+            keyboardType="numeric"
+            style={guessStyles.input}
+        />
+    );
+};
 
 const getColor = (color) => {
     switch (color) {
@@ -38,19 +46,37 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         violet: '',
     });
 
-    const correctAnswers = {
-        red: '1',
-        blue: '2',
-        green: '1',
-        yellow: '2',
-        violet: '1',
-    };
+    useEffect(() => {
+        if (!visible) {
+            // Limpiar los valores de los inputs cuando se cierre la modal
+            setColorValues({
+                red: '',
+                blue: '',
+                green: '',
+                yellow: '',
+                violet: '',
+            });
+        }
+    }, [visible]);
 
     const handleGuess = () => {
-        const guessedCorrectly = Object.entries(colorValues).every(
-            ([color, value]) => value === correctAnswers[color]
-        );
-        onGuess(guessedCorrectly);
+        // Verificar si todos los inputs tienen un valor
+        const allInputsFilled = Object.values(colorValues).every(value => value.trim() !== '');
+        if (!allInputsFilled) {
+            Alert.alert('Todos los campos son obligatorios', 'Por favor, complete todos los campos.');
+            return;
+        }
+
+        // Verificar si todos los inputs contienen números válidos entre 1 y 30
+        const isValidNumber = Object.values(colorValues).every(value => /^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 30);
+        if (!isValidNumber) {
+            Alert.alert('Números inválidos', 'Por favor, ingrese números válidos entre 1 y 30 en todos los campos.');
+            return;
+        }
+
+        // Si todos los inputs son válidos, llamar a la función onGuess
+        const guessedValues = Object.values(colorValues);
+        onGuess(guessedValues);
     };
 
     const handleColorValueChange = (color, value) => {
@@ -91,6 +117,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         </Modal>
     );
 };
+
 
 const guessStyles = StyleSheet.create({
     centeredView: {
