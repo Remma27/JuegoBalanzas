@@ -4,7 +4,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, Button, TextInput, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import Textarea from 'react-native-textarea';
@@ -19,11 +19,16 @@ const BalancingScales = () => {
   const [isFirstTurn, setIsFirstTurn] = useState(true);
   const [selectedColor, setSelectedColor] = useState(null);
   const [colorModalVisible, setColorModalVisible] = useState(false);
+  const scrollViewRef = useRef(null);
 
 
   const addToLog = message => {
     setMensajes(prevMensajes => prevMensajes + message + '\n');
     console.log(message);
+  };
+
+  const scrollToEnd = () => {
+    scrollViewRef.current.scrollToEnd({ animated: true });
   };
 
   async function showAlert(title, message, buttons) {
@@ -239,7 +244,11 @@ const BalancingScales = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Balancing Scales</Text>
 
-      <ScrollView style={styles.textareaContainer}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.textareaContainer}
+        contentContainerStyle={styles.textareaContent}
+        onContentSizeChange={scrollToEnd}>
         <Textarea style={styles.textarea} value={mensajes} editable={false} />
       </ScrollView>
 

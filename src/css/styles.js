@@ -12,6 +12,11 @@ export const styles = StyleSheet.create({
         marginTop: 20,
         fontSize: 24,
         fontWeight: 'bold',
+        color: '#333', // Cambia el color del título
+        marginBottom: 30, // Agrega espacio después del título
+        textShadowColor: '#aaa', // Agrega sombra al texto
+        textShadowOffset: { width: 1, height: 1 }, // Ajusta la sombra
+        textShadowRadius: 2, // Ajusta la sombra
     },
     boxContainer: {
         flexDirection: 'row',
