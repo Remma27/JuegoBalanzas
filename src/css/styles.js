@@ -2,18 +2,22 @@ import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
     container: {
+        
         flex: 1,
         backgroundColor: '#f0f0f0',
         alignItems: 'center',
         justifyContent: 'center',
     },
     title: {
+      
+        color:'black',
         marginTop: 20,
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center', // Alineación centrada del texto
     },
     boxContainer: {
+        
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 20,
@@ -86,19 +90,47 @@ export const styles = StyleSheet.create({
     },
     textareaContainer: {
         flex: 1,
-        padding: 10,
-        borderColor: '#355DA8',
+        padding: 20, // Aumenta el espacio alrededor del Textarea
         borderWidth: 1,
-        marginBottom: 10,
+        borderColor: '#E0E0E0',
+        marginBottom: 20,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 8,
+        shadowColor: '#000000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
     },
     textarea: {
-        backgroundColor: '#FFFFFF',
-        color: '#000000',
+        backgroundColor: '#F9F9F9', // Cambia el color de fondo
+        color: '#333333',
         fontSize: 16,
-        padding: 5,
-        borderColor: '#355DA8',
+        padding: 15,
         borderWidth: 1,
-        minHeight: 100, // Altura mínima del área de texto
+        borderColor: '#DADADA', // Cambia el color del borde
+        minHeight: 200,
+        fontFamily: 'SFMono-Regular',
+        borderRadius: 8,
+       textAlignVertical: 'top',
+    },
+    sectionHeader: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    balanceInfo: {
+        marginBottom: 15,
+    },
+    mineralInfo: {
+        marginBottom: 5,
+    },
+    clueInfo: {
+        color: '#4CAF50', // Verde
+        fontStyle: 'italic',
     },
     input: {
         height: 40,
@@ -126,22 +158,30 @@ export const styles = StyleSheet.create({
         alignItems: 'flex-start', // Alineación vertical al inicio
         width: '70%',
         paddingHorizontal: 20,
-        marginTop: 0, // Modifica este valor según lo necesites
+        marginTop: 90, // Modifica este valor según lo necesites
+        padding:50,
     },
     button: {
-        backgroundColor: '#FFD700', // Color amarillo para el botón "Adivinar pesos"
+        width: 170,
+        height: 45,
+        backgroundColor: 'blue',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
-        marginHorizontal: 5, // Margen horizontal entre botones
-    },
-    button1: {
-        backgroundColor: 'blue', // Color azul para el botón "Colocar cubos"
+        marginHorizontal: 5,
+        textAlign: 'center', // Alinear texto al centro
+      },
+      button1: {
+        width: 170,
+        height: 45,
+        backgroundColor: '#FFD700',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
-        marginHorizontal: 5, // Margen horizontal entre botones
-    },
+        marginHorizontal: 5,
+        textAlign: 'center', // Alinear texto al centro
+      },
+      
     buttonText: {
         color: 'white',
         fontWeight: 'bold',

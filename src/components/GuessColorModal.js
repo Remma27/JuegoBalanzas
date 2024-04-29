@@ -1,18 +1,24 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput } from 'react-native';
-import { Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 
-const ColorInput = ({ color, value, onChangeText }) => (
-    <TextInput
-        placeholder={color.charAt(0).toUpperCase() + color.slice(1)}
-        onChangeText={(text) => onChangeText(color, text)}
-        value={value}
-        keyboardType="numeric"
-        style={[guessStyles.input, { backgroundColor: getColor(color) }]}
-    />
-);
+const ColorInput = ({ color, value, onChangeText }) => {
+    const handleChangeText = (text) => {
+        if (/^\d+$/.test(text) && parseInt(text, 10) >= 1 && parseInt(text, 10) <= 30) {
+            onChangeText(color, text);
+        }
+    };
+
+    return (
+        <TextInput
+            placeholder={`Enter `}
+            onChangeText={handleChangeText}
+            value={value}
+            keyboardType="numeric"
+            style={[guessStyles.input, { backgroundColor: getColor(color) }]}
+        />
+    );
+};
 
 const getColor = (color) => {
     switch (color) {
@@ -40,16 +46,36 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         violet: null,
     });
 
+    useEffect(() => {
+        if (!visible) {
+            // Clear input values when the modal is closed
+            setColorValues({
+                red: '',
+                blue: '',
+                green: '',
+                yellow: '',
+                violet: '',
+            });
+        }
+    }, [visible]);
+
     const handleGuess = () => {
-        // Verificar si todos los inputs tienen un valor
-        const allInputsFilled = Object.values(colorValues).every(value => value !== null);
+        // Check if all inputs have a value
+        const allInputsFilled = Object.values(colorValues).every(value => value.trim() !== '');
         if (!allInputsFilled) {
-            Alert.alert('Todos los campos son obligatorios', 'Por favor, complete todos los campos.');
+            Alert.alert('All fields are required', 'Please fill in all fields.');
             return;
         }
 
-        // Si todos los inputs son válidos, llamar a la función onGuess
-        const guessedValues = colorValues;
+        // Check if all inputs contain valid numbers between 1 and 30
+        const isValidNumber = Object.values(colorValues).every(value => /^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 30);
+        if (!isValidNumber) {
+            Alert.alert('Invalid numbers', 'Please enter valid numbers between 1 and 30 in all fields.');
+            return;
+        }
+
+        // If all inputs are valid, call the onGuess function
+        const guessedValues = Object.values(colorValues);
         onGuess(guessedValues);
     };
 
@@ -65,7 +91,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         <Text style={guessStyles.closeButtonText}>X</Text>
                     </TouchableOpacity>
                     <Text style={guessStyles.modalText}>
-                        Ingresa el número correspondiente a cada color:
+                        Enter the number corresponding to each color:
                     </Text>
                     {Object.keys(colorValues).map((color) => (
                         <ColorInput
@@ -80,8 +106,15 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                             style={[guessStyles.button, guessStyles.guessButton]}
                             onPress={handleGuess}
                         >
-                            <Text style={guessStyles.buttonText}>Adivinar</Text>
+                            <Text style={guessStyles.buttonText}>Guess</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[guessStyles.button, guessStyles.closeButton]}
+                            onPress={onClose}
+                        >
+                            <Text style={guessStyles.buttonText}>Close</Text>
+                        </TouchableOpacity>
+
                     </View>
                 </View>
             </View>
@@ -131,12 +164,13 @@ const guessStyles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         elevation: 2,
-        width: '48%', // Ajusta el ancho de los botones
+        width: '48%',
     },
     guessButton: {
         backgroundColor: '#2196F3',
     },
     closeButton: {
+        backgroundColor: '#FF6347',
         position: 'absolute',
         top: 10,
         right: 10,

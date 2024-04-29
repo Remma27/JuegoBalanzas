@@ -1,17 +1,21 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-hooks/exhaustive-deps */
-
-
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
 import { styles } from '../css/styles';
+import { TextInput } from 'react-native';
 import MineralColorModal from './MineralColorModal';
+import { StyleSheet } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { ViewPropTypes } from 'react-native';
+import { ScrollView,props } from 'react-native';
 
 
-const BalancingScales = () => {
+
+
+const BalancingScales = ({ playerName }) => {
+
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [mensajes, setMensajes] = useState('');
   const [isFirstTurn, setIsFirstTurn] = useState(true);
@@ -19,7 +23,7 @@ const BalancingScales = () => {
   const [colorModalVisible, setColorModalVisible] = useState(false);
   const [mainScale, setMainScale] = useState([[], []]); // [left_minerals, right_minerals]
   const [remainingMinerals, setRemainingMinerals] = useState({ red: 2, yellow: 2, green: 2, blue: 2, violet: 2 });
-
+  const scrollViewRef = useRef();
   const addToLog = message => {
     setMensajes(prevMensajes => prevMensajes + message + '\n');
     console.log(message);
@@ -63,7 +67,8 @@ const BalancingScales = () => {
     const revealedMineralIndex = Math.floor(Math.random() * 10);
     const revealedWeight = mineralWeights[revealedMineralIndex];
     const revealedColor = mineralNames[revealedMineralIndex].split(' ')[0].toLowerCase();
-    addToLog(`The weight of ${revealedColor} minerals is: ${revealedWeight} grams`);
+    addToLog(`This is a clue: The weight of ${revealedColor} minerals is ${revealedWeight} grams.`);
+
 
     // Actualizar el estado de la balanza y los minerales restantes
     setMainScale(mainScaleCopy);
@@ -127,10 +132,14 @@ const BalancingScales = () => {
   };
 
   const placeMineral = async (color) => {
-    if (!color) {
-      addToLog('Error: Please select a color.');
-      return;
+    // Verificar si quedan minerales del color seleccionado
+    if (remainingMinerals[color] <= 0) {
+      // Mostrar un mensaje indicando que no hay minerales disponibles
+      addToLog(`No ${color} minerals available.`);
+      return false; // No se pudo colocar el mineral
     }
+  
+    // Si hay minerales disponibles, preguntar al usuario por el lado donde desea colocar el mineral
     const side = await new Promise(resolve => {
       showAlert(
         'Enter Side',
@@ -142,11 +151,13 @@ const BalancingScales = () => {
         { cancelable: false },
       );
     });
-
+  
     if (side !== 'l' && side !== 'r') {
       addToLog("Invalid side. Enter 'l' for left or 'r' for right.");
-      return;
+      return false; // No se pudo colocar el mineral
     }
+  
+    
 
     setRemainingMinerals(prevRemainingMinerals => {
       const remainingMineralsCopy = { ...prevRemainingMinerals };
@@ -193,7 +204,6 @@ const BalancingScales = () => {
   const handleColorSelect = async (color) => {
     setSelectedColor(color); // Actualizar el estado de selectedColor
     addToLog(`Selected color: ${color}`);
-
     await placeMineral(color); // Llamar a placeMineral después de actualizar selectedColor
   };
 
@@ -245,24 +255,33 @@ const BalancingScales = () => {
     main();
   }, []);
 
+  useEffect(() => {
+    // Función para desplazar el ScrollView hacia abajo cuando cambia su contenido
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [mensajes]); // Se activa cada vez que cambia el contenido del mensaje
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balancing Scales</Text>
-
-      <ScrollView style={styles.textareaContainer} contentContainerStyle={styles.scrollViewContent}>
+  
+      <Text>Player Name: {playerName}</Text>
+  
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.textareaContainer}
+        contentContainerStyle={styles.scrollViewContent}
+      >
         <TextInput style={styles.textarea} value={mensajes} editable={false} multiline={true} />
       </ScrollView>
-
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.rightButton]} onPress={openColorModal}>
-          <Text style={styles.buttonText}>Colocar cubos</Text>
+          <Text style={styles.buttonText}>Place cubes</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button1, styles.leftButton]} onPress={openModal}>
-          <Text style={styles.buttonText}>Adivinar pesos</Text>
-
+          <Text style={styles.buttonText}>Guess weights</Text>
         </TouchableOpacity>
-
-
       </View>
 
       <GuessColorModal
