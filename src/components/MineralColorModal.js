@@ -22,6 +22,9 @@ const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
         >
             <View style={styles.centeredView}>
                 <View style={styles.modalView}>
+                    <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                        <Text style={styles.closeButtonText}>X</Text>
+                    </TouchableOpacity>
                     <Text style={styles.modalText}>Choose the color of the mineral:</Text>
                     {colors.map((color, index) => (
                         <TouchableOpacity
@@ -72,6 +75,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'red',
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closeButtonText: {
         color: 'white',
         fontWeight: 'bold',
     },

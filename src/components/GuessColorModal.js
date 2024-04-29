@@ -87,6 +87,9 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         <Modal visible={visible} animationType="slide" transparent>
             <View style={guessStyles.centeredView}>
                 <View style={guessStyles.modalView}>
+                    <TouchableOpacity style={guessStyles.closeButton} onPress={onClose}>
+                        <Text style={guessStyles.closeButtonText}>X</Text>
+                    </TouchableOpacity>
                     <Text style={guessStyles.modalText}>
                         Enter the number corresponding to each color:
                     </Text>
@@ -111,6 +114,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         >
                             <Text style={guessStyles.buttonText}>Close</Text>
                         </TouchableOpacity>
+
                     </View>
                 </View>
             </View>
@@ -167,6 +171,19 @@ const guessStyles = StyleSheet.create({
     },
     closeButton: {
         backgroundColor: '#FF6347',
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'red',
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
     buttonText: {
         color: 'white',

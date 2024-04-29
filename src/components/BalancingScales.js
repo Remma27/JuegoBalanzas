@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
 import GuessColorModal from './GuessColorModal';
-import Textarea from 'react-native-textarea';
 import { styles } from '../css/styles';
 import { TextInput } from 'react-native';
 import MineralColorModal from './MineralColorModal';
@@ -22,7 +21,6 @@ const BalancingScales = ({ playerName }) => {
   const [isFirstTurn, setIsFirstTurn] = useState(true);
   const [selectedColor, setSelectedColor] = useState(null);
   const [colorModalVisible, setColorModalVisible] = useState(false);
-  const [initialInfoPrinted, setInitialInfoPrinted] = useState(false);
   const [mainScale, setMainScale] = useState([[], []]); // [left_minerals, right_minerals]
   const [remainingMinerals, setRemainingMinerals] = useState({ red: 2, yellow: 2, green: 2, blue: 2, violet: 2 });
   const scrollViewRef = useRef();
@@ -191,7 +189,6 @@ const BalancingScales = ({ playerName }) => {
     });
   };
 
-
   const main = () => {
     playRound();
   };
@@ -286,13 +283,13 @@ const BalancingScales = ({ playerName }) => {
           <Text style={styles.buttonText}>Guess weights</Text>
         </TouchableOpacity>
       </View>
-  
+
       <GuessColorModal
         visible={modalVisible}
         onClose={closeModal}
         onGuess={handleGuess}
       />
-  
+
       {colorModalVisible && (
         <MineralColorModal
           visible={colorModalVisible}
@@ -302,7 +299,7 @@ const BalancingScales = ({ playerName }) => {
       )}
     </View>
   );
-  
+
 };
 
 export default BalancingScales;
