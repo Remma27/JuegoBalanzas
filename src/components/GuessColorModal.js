@@ -11,11 +11,11 @@ const ColorInput = ({ color, value, onChangeText }) => {
 
     return (
         <TextInput
-            placeholder={color.charAt(0).toUpperCase() + color.slice(1)}
+            placeholder={`Enter `}
             onChangeText={handleChangeText}
             value={value}
             keyboardType="numeric"
-            style={guessStyles.input}
+            style={[guessStyles.input, { backgroundColor: getColor(color) }]}
         />
     );
 };
@@ -48,7 +48,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
 
     useEffect(() => {
         if (!visible) {
-            // Limpiar los valores de los inputs cuando se cierre la modal
+            // Clear input values when the modal is closed
             setColorValues({
                 red: '',
                 blue: '',
@@ -60,21 +60,21 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
     }, [visible]);
 
     const handleGuess = () => {
-        // Verificar si todos los inputs tienen un valor
+        // Check if all inputs have a value
         const allInputsFilled = Object.values(colorValues).every(value => value.trim() !== '');
         if (!allInputsFilled) {
-            Alert.alert('Todos los campos son obligatorios', 'Por favor, complete todos los campos.');
+            Alert.alert('All fields are required', 'Please fill in all fields.');
             return;
         }
 
-        // Verificar si todos los inputs contienen números válidos entre 1 y 30
+        // Check if all inputs contain valid numbers between 1 and 30
         const isValidNumber = Object.values(colorValues).every(value => /^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 30);
         if (!isValidNumber) {
-            Alert.alert('Números inválidos', 'Por favor, ingrese números válidos entre 1 y 30 en todos los campos.');
+            Alert.alert('Invalid numbers', 'Please enter valid numbers between 1 and 30 in all fields.');
             return;
         }
 
-        // Si todos los inputs son válidos, llamar a la función onGuess
+        // If all inputs are valid, call the onGuess function
         const guessedValues = Object.values(colorValues);
         onGuess(guessedValues);
     };
@@ -88,7 +88,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
             <View style={guessStyles.centeredView}>
                 <View style={guessStyles.modalView}>
                     <Text style={guessStyles.modalText}>
-                        Ingresa el número correspondiente a cada color:
+                        Enter the number corresponding to each color:
                     </Text>
                     {Object.keys(colorValues).map((color) => (
                         <ColorInput
@@ -103,13 +103,13 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                             style={[guessStyles.button, guessStyles.guessButton]}
                             onPress={handleGuess}
                         >
-                            <Text style={guessStyles.buttonText}>Adivinar</Text>
+                            <Text style={guessStyles.buttonText}>Guess</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[guessStyles.button, guessStyles.closeButton]}
                             onPress={onClose}
                         >
-                            <Text style={guessStyles.buttonText}>Cerrar</Text>
+                            <Text style={guessStyles.buttonText}>Close</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -117,7 +117,6 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         </Modal>
     );
 };
-
 
 const guessStyles = StyleSheet.create({
     centeredView: {
@@ -161,13 +160,13 @@ const guessStyles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         elevation: 2,
-        width: '48%', // Ajusta el ancho de los botones
+        width: '48%',
     },
     guessButton: {
         backgroundColor: '#2196F3',
     },
     closeButton: {
-        backgroundColor: '#FF6347', // Color rojo para cerrar
+        backgroundColor: '#FF6347',
     },
     buttonText: {
         color: 'white',
