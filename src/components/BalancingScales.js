@@ -1,34 +1,32 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native'; // Importa TextInput para obtener la entrada del usuario// Importa TextInput para obtener la entrada del usuario
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+
+// Imports the necessary components from React and React Native
+import React, { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import GuessColorModal from './GuessColorModal';
 import { styles } from '../css/styles';
-import { TextInput } from 'react-native';
 import MineralColorModal from './MineralColorModal';
-import { StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native';
-import { ViewPropTypes } from 'react-native';
-import { ScrollView,props } from 'react-native';
-
-
-
+import { useRef } from 'react';
 
 const BalancingScales = ({ playerName }) => {
-
-  
   const [modalVisible, setModalVisible] = useState(false);
   const [mensajes, setMensajes] = useState('');
   const [isFirstTurn, setIsFirstTurn] = useState(true);
   const [selectedColor, setSelectedColor] = useState(null);
   const [colorModalVisible, setColorModalVisible] = useState(false);
-  const [mainScale, setMainScale] = useState([[], []]); // [left_minerals, right_minerals]
+  const [mainScale, setMainScale] = useState([[], []]);
   const [remainingMinerals, setRemainingMinerals] = useState({ red: 2, yellow: 2, green: 2, blue: 2, violet: 2 });
   const scrollViewRef = useRef();
+
   const addToLog = message => {
     setMensajes(prevMensajes => prevMensajes + message + '\n');
     console.log(message);
   };
 
+  // Function to show an alert with a title, message, and buttons
   async function showAlert(title, message, buttons) {
     return new Promise(resolve => {
       Alert.alert(title, message, buttons, { cancelable: false });
@@ -36,14 +34,16 @@ const BalancingScales = ({ playerName }) => {
     });
   }
 
-  // Define possible weights of minerals
-  const possibleWeights = Array.from({ length: 30 }, (_, i) => i + 1); // Weights between 1 and 30 grams
+  // Array with possible weights for the minerals
+  const possibleWeights = Array.from({ length: 30 }, (_, i) => i + 1);
 
+  // Function to generate the weights for the minerals
   const generateMineralWeights = () => {
     const weights = [];
     const mineralNames = [];
     const colors = ['red', 'yellow', 'green', 'blue', 'violet'];
 
+    // Shuffle the colors array to randomize the order of the minerals
     colors.forEach(color => {
       const weight = possibleWeights[Math.floor(Math.random() * possibleWeights.length)];
       const count = remainingMinerals[color];
@@ -58,52 +58,53 @@ const BalancingScales = ({ playerName }) => {
   };
 
 
+  // Function to play a round of the game
   const playRound = async () => {
+    // Generates the weights for the minerals
     const [mineralWeights, mineralNames] = generateMineralWeights();
-    const mainScaleCopy = [[...mainScale[0]], [...mainScale[1]]]; // Copia de la balanza actual
-    const remainingMineralsCopy = { ...remainingMinerals }; // Copia de los minerales restantes
+    // Creates a copy of the main scale and the remaining minerals
+    const mainScaleCopy = [[...mainScale[0]], [...mainScale[1]]];
+    // Creates a copy of the remaining minerals
+    const remainingMineralsCopy = { ...remainingMinerals };
 
-    // Reveal weight of a random mineral
     const revealedMineralIndex = Math.floor(Math.random() * 10);
     const revealedWeight = mineralWeights[revealedMineralIndex];
+    // Reveals the weight of a random mineral
     const revealedColor = mineralNames[revealedMineralIndex].split(' ')[0].toLowerCase();
     addToLog(`This is a clue: The weight of ${revealedColor} minerals is ${revealedWeight} grams.`);
 
 
-    // Actualizar el estado de la balanza y los minerales restantes
     setMainScale(mainScaleCopy);
     setRemainingMinerals(remainingMineralsCopy);
 
-    // Imprimir la información inicial de la balanza y los minerales restantes
+    // If it is the first turn, print the balance information
     if (isFirstTurn) {
       setIsFirstTurn(false);
     }
+    // If it is not the first turn, print the balance information
     printBalanceInfo(mainScaleCopy, remainingMineralsCopy);
   };
 
+  // Function to print the balance information
   const printBalanceInfo = (mainScale, remainingMinerals) => {
-    // Check if the balance is empty
+    // Checks if the main scale is empty
     const isEmpty = mainScale[0].length === 0 && mainScale[1].length === 0;
 
-    // If the balance is not empty, print the balance information
+    // If the main scale is not empty, print the balance information
     if (!isEmpty) {
-      // Get minerals on each side of the balance
       const leftMinerals = mainScale[0].map(mineral => mineral.split(' ')[0]);
       const rightMinerals = mainScale[1].map(mineral => mineral.split(' ')[0]);
 
-      // Calculate the difference in the number of minerals between both sides
       const balanceDifference = leftMinerals.length - rightMinerals.length;
 
-      // Create a visual representation of the minerals on each side
       const visualLeft = getCountedMinerals(leftMinerals);
       const visualRight = getCountedMinerals(rightMinerals);
 
-      // Print balance information
       addToLog('\nBalance\n');
       addToLog(`Left side: ${visualLeft}`);
       addToLog(`Right side: ${visualRight}`);
 
-      // Print which side is heavier
+      // Checks the balance difference and prints the result
       if (balanceDifference === 0) {
         addToLog('The balance is even.');
       } else if (balanceDifference > 0) {
@@ -113,7 +114,7 @@ const BalancingScales = ({ playerName }) => {
       }
     }
 
-    // Print remaining minerals only if the balance is not empty
+    // Prints the remaining minerals
     if (!isEmpty) {
       addToLog('\nRemaining minerals:');
       for (const [color, quantity] of Object.entries(remainingMinerals)) {
@@ -123,23 +124,22 @@ const BalancingScales = ({ playerName }) => {
     }
   };
 
+  // Function to count the minerals
   const getCountedMinerals = (minerals) => {
     const mineralCounts = {};
+    // Counts the minerals and returns the result
     minerals.forEach(mineral => {
       mineralCounts[mineral] = (mineralCounts[mineral] || 0) + 1;
     });
     return Object.entries(mineralCounts).map(([mineral, count]) => `${count} ${mineral}`).join(', ');
   };
 
+  // Function to place a mineral on the scale
   const placeMineral = async (color) => {
-    // Verificar si quedan minerales del color seleccionado
     if (remainingMinerals[color] <= 0) {
-      // Mostrar un mensaje indicando que no hay minerales disponibles
       addToLog(`No ${color} minerals available.`);
-      return false; // No se pudo colocar el mineral
+      return false;
     }
-  
-    // Si hay minerales disponibles, preguntar al usuario por el lado donde desea colocar el mineral
     const side = await new Promise(resolve => {
       showAlert(
         'Enter Side',
@@ -151,14 +151,12 @@ const BalancingScales = ({ playerName }) => {
         { cancelable: false },
       );
     });
-  
+    // Checks the side and places the mineral
     if (side !== 'l' && side !== 'r') {
       addToLog("Invalid side. Enter 'l' for left or 'r' for right.");
       return false; // No se pudo colocar el mineral
     }
-  
-    
-
+    // Places the mineral on the scale
     setRemainingMinerals(prevRemainingMinerals => {
       const remainingMineralsCopy = { ...prevRemainingMinerals };
 
@@ -166,12 +164,14 @@ const BalancingScales = ({ playerName }) => {
         return mineralColor.startsWith(color.toLowerCase()) && quantity > 0;
       });
 
+      // Checks if the mineral was found
       if (placedMineralIndex !== -1) {
+        // Places the mineral on the scale
         const [placedMineralColor] = Object.entries(remainingMineralsCopy)[placedMineralIndex];
         remainingMineralsCopy[placedMineralColor]--;
 
         addToLog(`Placing mineral on ${side} side: ${placedMineralColor} - Quantity left: ${remainingMineralsCopy[placedMineralColor]}`);
-
+        // Updates the main scale and the remaining minerals
         setMainScale(prevMainScale => {
           const newMainScale = [
             side === 'l' ? [...prevMainScale[0], `${placedMineralColor.charAt(0).toUpperCase() + placedMineralColor.slice(1)} ${remainingMineralsCopy[placedMineralColor] + 1}`] : [...prevMainScale[0]],
@@ -189,68 +189,74 @@ const BalancingScales = ({ playerName }) => {
     });
   };
 
+  // Function to play the game
   const main = () => {
     playRound();
   };
 
+  // Function to open the color modal
   const openColorModal = () => {
     setColorModalVisible(true);
   };
 
+  // Function to close the color modal
   const closeColorModal = () => {
     setColorModalVisible(false);
   };
 
+  // Function to handle the color selection
   const handleColorSelect = async (color) => {
-    setSelectedColor(color); // Actualizar el estado de selectedColor
+    setSelectedColor(color);
     addToLog(`Selected color: ${color}`);
-    await placeMineral(color); // Llamar a placeMineral después de actualizar selectedColor
+
+    await placeMineral(color);
   };
 
+  // Function to open the modal
   const openModal = () => {
     setModalVisible(true);
   };
 
+  // Function to close the modal
   const closeModal = () => {
     setModalVisible(false);
   };
 
+  // Function to handle the guesses of the weights of the minerals
   const handleGuess = (guessedWeights) => {
-    console.log('Guessed weights:', guessedWeights); // Verifica el valor de guessedWeights aquí
+    addToLog('Guessed weights:', guessedWeights);
 
-    // Convertir guessedWeights en un objeto
+    // Checks if the guessed weights are correct
     const guessedWeightsObj = guessedWeights;
 
-    // Inicializar una variable para rastrear si todas las adivinanzas son correctas
     let allCorrect = true;
 
-    // Iterar sobre las adivinanzas para cada mineral
     for (const [color, weight] of Object.entries(guessedWeightsObj)) {
-      // Obtener la lista de minerales en el lado correspondiente
       const minerals = mainScale[0].concat(mainScale[1]);
 
-      // Verificar si el mineral está en la lista
+      // Finds the mineral with the color and weight
       const mineralFound = minerals.find(mineral => mineral.toLowerCase().startsWith(color));
 
-      // Si el mineral no está en la lista o si el peso es incorrecto, marcar la adivinanza como incorrecta
+      // Checks if the mineral was found and if the weight is correct
       if (!mineralFound || parseInt(mineralFound.split(' ')[2], 10) !== weight) {
         allCorrect = false;
-        break; // No necesitamos seguir verificando si ya encontramos una adivinanza incorrecta
+        break;
+      } else {
+        addToLog(`Correct guess: ${mineralFound} - Weight: ${weight} grams`);
       }
     }
 
-    // Log the result
+    // Sends the data to the API
     if (allCorrect) {
-      addToLog('¡Adivinaste correctamente!');
+      addToLog('Congratulations! You guessed correctly!');
     } else {
-      addToLog('Lo siento, una o más de tus adivinanzas son incorrectas.');
+      addToLog('Sorry, one or more of your guesses are incorrect.');
     }
-
-    // Close the modal
     closeModal();
   };
 
 
+  // Use effect hook to run the main function when the component mounts
   useEffect(() => {
     main();
   }, []);
@@ -262,12 +268,130 @@ const BalancingScales = ({ playerName }) => {
     }
   }, [mensajes]); // Se activa cada vez que cambia el contenido del mensaje
 
+  // Function to send the data to the API
+  const sendDataToAPI = async () => {
+    try {
+      const mineralWeights = mainScale[0].concat(mainScale[1]).map(mineral => {
+        const [color, weight] = mineral.split(' ');
+        return { color: color.toLowerCase(), weight: parseInt(weight, 10) };
+      });
+
+      const requestData = {
+        mineralWeights,
+      };
+
+      const response = await fetch('/game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+    } catch (error) {
+      console.error('Error al enviar datos al API:', error);
+    }
+  };
+
+  // Function to update the winner of the game
+  const updateGameWinner = async (gameId, winnerId) => {
+    try {
+      const requestData = {
+        winner: winnerId,
+      };
+
+      const response = await fetch(`/game/${gameId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+    } catch (error) {
+      console.error('Error al enviar datos al API:', error);
+    }
+  };
+
+  // Función para crear un jugador
+  const createPlayer = async (name) => {
+    try {
+      const requestData = {
+        'name': name,
+      };
+
+      const response = await fetch('http://localhost:5001/player', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      // Verificar si la respuesta fue exitosa
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      // No es necesario parsear la respuesta JSON porque ya estamos manejando una respuesta exitosa
+      const data = await response.json();
+
+      // Mostrar la respuesta del servidor
+      console.log('Respuesta del servidor:', data);
+    } catch (error) {
+      // Manejar errores
+      console.error('Error al enviar datos al API:', error.message);
+    }
+  };
+
+
+
+  // Function to update the points of a player
+  const updatePlayerPoints = async (playerId, points) => {
+    try {
+      const requestData = {
+        points,
+      };
+
+      const response = await fetch(`/player/${playerId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Respuesta del servidor:', data);
+    } catch (error) {
+      console.error('Error al enviar datos al API:', error);
+    }
+  };
+
+
+  // Returns the BalancingScales component
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Balancing Scales</Text>
-  
+
       <Text>Player Name: {playerName}</Text>
-  
+
       <ScrollView
         ref={scrollViewRef}
         style={styles.textareaContainer}
@@ -281,8 +405,8 @@ const BalancingScales = ({ playerName }) => {
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button1, styles.leftButton]} onPress={openModal}>
           <Text style={styles.buttonText}>Guess weights</Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity >
+      </View >
 
       <GuessColorModal
         visible={modalVisible}
@@ -290,14 +414,16 @@ const BalancingScales = ({ playerName }) => {
         onGuess={handleGuess}
       />
 
-      {colorModalVisible && (
-        <MineralColorModal
-          visible={colorModalVisible}
-          onClose={closeColorModal}
-          onSelectColor={handleColorSelect}
-        />
-      )}
-    </View>
+      {
+        colorModalVisible && (
+          <MineralColorModal
+            visible={colorModalVisible}
+            onClose={closeColorModal}
+            onSelectColor={handleColorSelect}
+          />
+        )
+      }
+    </View >
   );
 
 };

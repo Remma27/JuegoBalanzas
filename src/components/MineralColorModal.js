@@ -1,18 +1,23 @@
 /* eslint-disable prettier/prettier */
+//Imports from React and React Native
 import React from 'react';
 import { Modal, Text, View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 
+//MineralColorModal component
 const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
+    //Colors and buttonColors arrays
     const colors = ['Red', 'Yellow', 'Green', 'Blue', 'Violet'];
     const buttonColors = ['#FF5733', '#FFC300', '#28B463', '#3498DB', '#9B59B6'];
     const screenWidth = Dimensions.get('window').width;
-    const buttonWidth = (screenWidth - 80) / colors.length; // Calcular el ancho de los botones
+    const buttonWidth = (screenWidth - 80) / colors.length;
 
+    //handleColorSelect function
     const handleColorSelect = (color) => {
         onSelectColor(color);
         onClose();
     };
 
+    //Modal component
     return (
         <Modal
             animationType="slide"
@@ -29,7 +34,7 @@ const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
                     {colors.map((color, index) => (
                         <TouchableOpacity
                             key={color}
-                            style={[styles.colorButton, { width: buttonWidth, backgroundColor: buttonColors[index] }]} // Establecer el ancho y color del botón
+                            style={[styles.colorButton, { width: buttonWidth, backgroundColor: buttonColors[index] }]}
                             onPress={() => handleColorSelect(color)}
                         >
                             <Text style={styles.buttonText}>{color}</Text>

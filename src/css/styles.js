@@ -1,23 +1,21 @@
+/* eslint-disable prettier/prettier */
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
     container: {
-        
         flex: 1,
         backgroundColor: '#f0f0f0',
         alignItems: 'center',
         justifyContent: 'center',
     },
     title: {
-      
-        color:'black',
+        color: 'black',
         marginTop: 20,
         fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'center', // Alineación centrada del texto
+        textAlign: 'center',
     },
     boxContainer: {
-        
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 20,
@@ -34,7 +32,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        zIndex: 1, // Colocar las cajas debajo de los cubos
+        zIndex: 1,
     },
     counter: {
         position: 'absolute',
@@ -59,7 +57,7 @@ export const styles = StyleSheet.create({
         borderColor: '#999',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 2, // Colocar los cubos encima de las cajas
+        zIndex: 2,
     },
     cubeText: {
         color: 'white',
@@ -90,7 +88,7 @@ export const styles = StyleSheet.create({
     },
     textareaContainer: {
         flex: 1,
-        padding: 20, // Aumenta el espacio alrededor del Textarea
+        padding: 20,
         borderWidth: 1,
         borderColor: '#E0E0E0',
         marginBottom: 20,
@@ -106,16 +104,16 @@ export const styles = StyleSheet.create({
         elevation: 2,
     },
     textarea: {
-        backgroundColor: '#F9F9F9', // Cambia el color de fondo
+        backgroundColor: '#F9F9F9',
         color: '#333333',
         fontSize: 16,
         padding: 15,
         borderWidth: 1,
-        borderColor: '#DADADA', // Cambia el color del borde
+        borderColor: '#DADADA',
         minHeight: 200,
         fontFamily: 'SFMono-Regular',
         borderRadius: 8,
-       textAlignVertical: 'top',
+        textAlignVertical: 'top',
     },
     sectionHeader: {
         fontWeight: 'bold',
@@ -129,7 +127,7 @@ export const styles = StyleSheet.create({
         marginBottom: 5,
     },
     clueInfo: {
-        color: '#4CAF50', // Verde
+        color: '#4CAF50',
         fontStyle: 'italic',
     },
     input: {
@@ -148,18 +146,18 @@ export const styles = StyleSheet.create({
     },
     btnEnviar: {
         backgroundColor: '#355DA8',
-        marginTop: 20, // Aumentando la separación desde la parte superior
+        marginTop: 20,
         height: 40,
         paddingTop: 10,
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'center', // Alineación horizontal al centro
-        alignItems: 'flex-start', // Alineación vertical al inicio
+        justifyContent: 'center',
+        alignItems: 'flex-start',
         width: '70%',
         paddingHorizontal: 20,
-        marginTop: 90, // Modifica este valor según lo necesites
-        padding:50,
+        marginTop: 0,
+        padding: 10,
     },
     button: {
         width: 170,
@@ -169,9 +167,9 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
         marginHorizontal: 5,
-        textAlign: 'center', // Alinear texto al centro
-      },
-      button1: {
+        textAlign: 'center',
+    },
+    button1: {
         width: 170,
         height: 45,
         backgroundColor: '#FFD700',
@@ -179,12 +177,11 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
         marginHorizontal: 5,
-        textAlign: 'center', // Alinear texto al centro
-      },
-      
+        textAlign: 'center',
+    },
     buttonText: {
         color: 'white',
         fontWeight: 'bold',
-        textAlign: 'center', // Alineación centrada del texto del botón
+        textAlign: 'center',
     },
 });

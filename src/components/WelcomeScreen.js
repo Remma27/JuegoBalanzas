@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
+import { Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 
 const WelcomeScreen = ({ startGame }) => {
   const [playerName, setPlayerName] = useState('');
@@ -14,21 +15,21 @@ const WelcomeScreen = ({ startGame }) => {
       <Text style={styles.rules}>Game Rules:</Text>
       <Text style={styles.rulesText}>
         1- Players receive 10 minerals of different colors (2 of each color) with weights between 1 gram and 30 grams, and must place them on a scale to balance it.
-        {"\n\n"}
+        {'\n\n'}
         2- Players receive information about one mineral at the beginning of the game.
-        {"\n\n"}
+        {'\n\n'}
         3- They use two scales, one main and one secondary, to place the minerals.
-        {"\n\n"}
+        {'\n\n'}
         4- Each turn, players must place at least two minerals on the main scale within a five-minute time frame.
-        {"\n\n"}
+        {'\n\n'}
         5- Players cannot exchange or transfer minerals, nor remove them from the scale.
-        {"\n\n"}
+        {'\n\n'}
         6- When the main scale is balanced, players can pay to guess the weight of each mineral.
-        {"\n\n"}
+        {'\n\n'}
         7- If guessed correctly, they win two prizes, but if any guess is incorrect, they lose the paid piece.
-        {"\n\n"}
+        {'\n\n'}
         8- The game ends when no player can place more minerals on the scale.
-        {"\n\n"}
+        {'\n\n'}
         9- If the scale is balanced at the end and all weights are guessed correctly, 100 million wones are added to the final prize; otherwise, it ends in failure with no additional prizes.
       </Text>
       <TextInput

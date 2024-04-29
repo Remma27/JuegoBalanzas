@@ -11,7 +11,7 @@ const ColorInput = ({ color, value, onChangeText }) => {
 
     return (
         <TextInput
-            placeholder={`Enter `}
+            placeholder={'Enter '}
             onChangeText={handleChangeText}
             value={value}
             keyboardType="numeric"
@@ -20,6 +20,7 @@ const ColorInput = ({ color, value, onChangeText }) => {
     );
 };
 
+//getColor function with color parameter and switch statement
 const getColor = (color) => {
     switch (color) {
         case 'red':
@@ -37,7 +38,9 @@ const getColor = (color) => {
     }
 };
 
+//GuessColorModal component with props visible, onClose, and onGuess
 const GuessColorModal = ({ visible, onClose, onGuess }) => {
+    //useState hook with colorValues and setColorValues
     const [colorValues, setColorValues] = useState({
         red: null,
         blue: null,
@@ -79,10 +82,12 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         onGuess(guessedValues);
     };
 
+    //handleColorValueChange function with color and value parameters
     const handleColorValueChange = (color, value) => {
         setColorValues((prevState) => ({ ...prevState, [color]: parseInt(value, 10) }));
     };
 
+    //Modal component
     return (
         <Modal visible={visible} animationType="slide" transparent>
             <View style={guessStyles.centeredView}>
@@ -108,13 +113,6 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         >
                             <Text style={guessStyles.buttonText}>Guess</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[guessStyles.button, guessStyles.closeButton]}
-                            onPress={onClose}
-                        >
-                            <Text style={guessStyles.buttonText}>Close</Text>
-                        </TouchableOpacity>
-
                     </View>
                 </View>
             </View>
@@ -174,7 +172,6 @@ const guessStyles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         right: 10,
-        backgroundColor: 'red',
         width: 30,
         height: 30,
         borderRadius: 15,
