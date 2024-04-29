@@ -1,26 +1,19 @@
 /* eslint-disable prettier/prettier */
-import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import { TextInput } from 'react-native';
+import { Alert } from 'react-native';
 
-const ColorInput = ({ color, value, onChangeText }) => {
-    const handleChangeText = (text) => {
-        if (/^\d+$/.test(text) && parseInt(text, 10) >= 1 && parseInt(text, 10) <= 30) {
-            onChangeText(color, text);
-        }
-    };
+const ColorInput = ({ color, value, onChangeText }) => (
+    <TextInput
+        placeholder={color.charAt(0).toUpperCase() + color.slice(1)}
+        onChangeText={(text) => onChangeText(color, text)}
+        value={value}
+        keyboardType="numeric"
+        style={[guessStyles.input, { backgroundColor: getColor(color) }]}
+    />
+);
 
-    return (
-        <TextInput
-            placeholder={'Enter '}
-            onChangeText={handleChangeText}
-            value={value}
-            keyboardType="numeric"
-            style={[guessStyles.input, { backgroundColor: getColor(color) }]}
-        />
-    );
-};
-
-//getColor function with color parameter and switch statement
 const getColor = (color) => {
     switch (color) {
         case 'red':
@@ -38,9 +31,7 @@ const getColor = (color) => {
     }
 };
 
-//GuessColorModal component with props visible, onClose, and onGuess
 const GuessColorModal = ({ visible, onClose, onGuess }) => {
-    //useState hook with colorValues and setColorValues
     const [colorValues, setColorValues] = useState({
         red: null,
         blue: null,
@@ -49,45 +40,21 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
         violet: null,
     });
 
-    useEffect(() => {
-        if (!visible) {
-            // Clear input values when the modal is closed
-            setColorValues({
-                red: '',
-                blue: '',
-                green: '',
-                yellow: '',
-                violet: '',
-            });
-        }
-    }, [visible]);
-
     const handleGuess = () => {
-        // Check if all inputs have a value
-        const allInputsFilled = Object.values(colorValues).every(value => value.trim() !== '');
+        const allInputsFilled = Object.values(colorValues).every(value => value !== null);
         if (!allInputsFilled) {
-            Alert.alert('All fields are required', 'Please fill in all fields.');
+            Alert.alert('All fields are mandatory', 'Please complete all fields.');
             return;
         }
 
-        // Check if all inputs contain valid numbers between 1 and 30
-        const isValidNumber = Object.values(colorValues).every(value => /^\d+$/.test(value) && parseInt(value, 10) >= 1 && parseInt(value, 10) <= 30);
-        if (!isValidNumber) {
-            Alert.alert('Invalid numbers', 'Please enter valid numbers between 1 and 30 in all fields.');
-            return;
-        }
-
-        // If all inputs are valid, call the onGuess function
-        const guessedValues = Object.values(colorValues);
+        const guessedValues = colorValues;
         onGuess(guessedValues);
     };
 
-    //handleColorValueChange function with color and value parameters
     const handleColorValueChange = (color, value) => {
         setColorValues((prevState) => ({ ...prevState, [color]: parseInt(value, 10) }));
     };
 
-    //Modal component
     return (
         <Modal visible={visible} animationType="slide" transparent>
             <View style={guessStyles.centeredView}>
@@ -162,16 +129,16 @@ const guessStyles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         elevation: 2,
-        width: '48%',
+        width: '48%', // Adjust button width
     },
     guessButton: {
         backgroundColor: '#2196F3',
     },
     closeButton: {
-        backgroundColor: '#FF6347',
         position: 'absolute',
         top: 10,
         right: 10,
+        backgroundColor: 'red',
         width: 30,
         height: 30,
         borderRadius: 15,
