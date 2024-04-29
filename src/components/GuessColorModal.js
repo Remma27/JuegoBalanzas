@@ -39,11 +39,11 @@ const getColor = (color) => {
 
 const GuessColorModal = ({ visible, onClose, onGuess }) => {
     const [colorValues, setColorValues] = useState({
-        red: '',
-        blue: '',
-        green: '',
-        yellow: '',
-        violet: '',
+        red: null,
+        blue: null,
+        green: null,
+        yellow: null,
+        violet: null,
     });
 
     useEffect(() => {
@@ -80,7 +80,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
     };
 
     const handleColorValueChange = (color, value) => {
-        setColorValues((prevState) => ({ ...prevState, [color]: value }));
+        setColorValues((prevState) => ({ ...prevState, [color]: parseInt(value, 10) }));
     };
 
     return (
@@ -94,7 +94,7 @@ const GuessColorModal = ({ visible, onClose, onGuess }) => {
                         <ColorInput
                             key={color}
                             color={color}
-                            value={colorValues[color]}
+                            value={colorValues[color] !== null ? String(colorValues[color]) : ''}
                             onChangeText={handleColorValueChange}
                         />
                     ))}
