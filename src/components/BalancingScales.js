@@ -62,7 +62,6 @@ const BalancingScales = ({ playerName }) => {
       });
 
       if (weights.length > 0 && names.length > 0) {
-        // Resuelve con los datos generados
         resolve({ weights, names });
       } else {
         reject('Error generating data');
@@ -79,25 +78,29 @@ const BalancingScales = ({ playerName }) => {
         currentMineralWeights = weights;
         currentMineralNames = names;
 
-        // Actualiza los estados para futuros turnos
         setMineralWeights(currentMineralWeights);
         setMineralNames(currentMineralNames);
 
-        // Muestra la pista en el primer turno
         const revealedMineralIndex = Math.floor(Math.random() * currentMineralWeights.length);
         const revealedWeight = currentMineralWeights[revealedMineralIndex];
         const revealedColor = currentMineralNames[revealedMineralIndex].split(' ')[0].toLowerCase();
 
-        addToLog(`This is a clue: The weight of ${revealedColor} minerals is ${revealedWeight} grams.`);
+        addToLog('--- New Round ---\n');
+        addToLog('You have 2 minerals of each color: red, yellow, green, blue, and violet.');
+        addToLog('Place the minerals on the scale and guess the weights.');
+        addToLog('You can place the minerals on the left or right side of the scale.');
+        addToLog('After placing the minerals, you can guess the weights.');
+        addToLog(`Here’s a clue: The weight of ${revealedColor} minerals is ${revealedWeight} grams.`);
+        addToLog('Good luck!');
+        addToLog('\n--- Start ---\n');
+
         setIsFirstTurn(false);
-        return;  // Termina aquí para que no continúe el resto del código en el primer turno
+        return;
       } else {
-        // Usa los valores del estado si no es el primer turno
         currentMineralWeights = mineralWeights;
         currentMineralNames = mineralNames;
       }
 
-      // Verifica si mineralWeights y mineralNames están bien inicializados
       if (!Array.isArray(currentMineralWeights) || !Array.isArray(currentMineralNames)) {
         throw new Error("Mineral weights or names are not properly initialized.");
       }
@@ -122,22 +125,19 @@ const BalancingScales = ({ playerName }) => {
     }
   };
 
-  // Función para imprimir la información de la balanza
+  // Function to print balance info
   const printBalanceInfo = (mainScale, remainingMinerals) => {
-    // Verifica si la balanza está vacía
     const isEmpty = mainScale[0].length === 0 && mainScale[1].length === 0;
 
     if (!isEmpty) {
-      // Extrae y cuenta los minerales de cada lado
       const leftMinerals = mainScale[0];
       const rightMinerals = mainScale[1];
 
-      // Calcula el peso total en cada lado
       const getWeightSum = (minerals) => {
         return minerals.reduce((totalWeight, mineral) => {
           const [name, quantityStr] = mineral.split(' ');
           const quantity = parseInt(quantityStr, 10);
-          const weight = mineralWeights[name.indexOf(name)] || 0;
+          const weight = mineralWeights[mineralNames.indexOf(name)] || 0;
           return totalWeight + (weight * quantity);
         }, 0);
       };
@@ -145,10 +145,8 @@ const BalancingScales = ({ playerName }) => {
       const weightLeft = getWeightSum(leftMinerals);
       const weightRight = getWeightSum(rightMinerals);
 
-      // Imprime la información de la balanza
       addToLog('\nBalance\n');
 
-      // Determina qué lado es más pesado
       if (weightLeft === weightRight) {
         addToLog('The balance is even.');
       } else if (weightLeft > weightRight) {
@@ -158,35 +156,21 @@ const BalancingScales = ({ playerName }) => {
       }
     }
 
-    // Imprime los minerales restantes
     addToLog('\nRemaining minerals:');
     Object.entries(remainingMinerals).forEach(([color, quantity]) => {
       const formattedColor = color.charAt(0).toUpperCase() + color.slice(1);
       addToLog(`${formattedColor}: ${quantity}`);
     });
+    addToLog('\n-- End of round --\n');
   };
 
-  // Función para contar los minerales y devolverlos en formato de string
-  const getCountedMinerals = (minerals) => {
-    const mineralCounts = minerals.reduce((acc, mineral) => {
-      acc[mineral] = (acc[mineral] || 0) + 1;
-      return acc;
-    }, {});
-
-    // Convierte el objeto en un array de strings
-    return Object.entries(mineralCounts)
-      .map(([mineral, count]) => `${count} ${mineral}`)
-      .join(', ');
-  };
-
-  // Función para colocar un mineral en la balanza
+  // Function to place a mineral on the scale
   const placeMineral = async (color) => {
     if (remainingMinerals[color] <= 0) {
       addToLog(`No ${color} minerals available.`);
       return false;
     }
 
-    // Muestra alerta para seleccionar el lado
     const side = await new Promise(resolve => {
       showAlert(
         'Enter Side',
@@ -198,23 +182,19 @@ const BalancingScales = ({ playerName }) => {
       );
     });
 
-    // Verifica si el lado es válido
     if (side !== 'l' && side !== 'r') {
       addToLog("Invalid side. Enter 'l' for left or 'r' for right.");
       return false;
     }
 
-    // Actualiza los minerales restantes y la balanza
     setRemainingMinerals(prevMinerales => {
       const newMinerals = { ...prevMinerales };
 
-      // Verifica si hay minerales del color seleccionado
       if (newMinerals[color.toLowerCase()] > 0) {
         newMinerals[color.toLowerCase()]--;
 
         addToLog(`Placing ${color} mineral on ${side === 'l' ? 'left' : 'right'} side. Quantity left: ${newMinerals[color.toLowerCase()]}`);
 
-        // Actualiza la balanza
         setMainScale(prevMainScale => {
           const updatedScale = [...prevMainScale];
           const mineralName = `${color.charAt(0).toUpperCase() + color.slice(1)} ${newMinerals[color.toLowerCase()] + 1}`;
@@ -225,7 +205,6 @@ const BalancingScales = ({ playerName }) => {
             updatedScale[1] = [...updatedScale[1], mineralName];
           }
 
-          // Imprime la información de la balanza
           printBalanceInfo(updatedScale, newMinerals);
           return updatedScale;
         });
@@ -239,26 +218,26 @@ const BalancingScales = ({ playerName }) => {
   };
 
   const handleGuess = (guessedWeights) => {
-    addToLog('Guessed weights:', guessedWeights);
+    addToLog('Guessed weights:');
+    Object.entries(guessedWeights).forEach(([color, weight]) => {
+      addToLog(`- ${color}: ${weight} grams`);
+    });
 
     let allCorrect = true;
     const weightMap = new Map();
 
-    // Crea un mapa para facilitar la comparación de pesos
     mineralNames.forEach((name, index) => {
-      const [color, number] = name.split(' ');
+      const [color] = name.split(' ');
       const weight = mineralWeights[index];
       weightMap.set(color.toLowerCase(), weight);
     });
 
     const details = [];
 
-    // Verifica las suposiciones
     Object.entries(guessedWeights).forEach(([color, guessedWeight]) => {
       const colorLower = color.toLowerCase();
       const correctWeight = weightMap.get(colorLower);
 
-      // Compara el peso adivinado con el peso correcto
       if (correctWeight === undefined) {
         details.push(`${color}: Guessed weight ${guessedWeight} grams, but the correct weight was not found.`);
         allCorrect = false;
@@ -277,7 +256,6 @@ const BalancingScales = ({ playerName }) => {
       details.forEach(detail => addToLog(`- ${detail}`));
     }
 
-    // Cierra el modal después de la suposición
     closeModal();
   };
 
