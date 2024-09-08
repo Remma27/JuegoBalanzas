@@ -37,7 +37,7 @@ const BalancingScales = ({ playerName }) => {
     });
   }
 
-  // Function to generate mineral weights and names
+  // Function to generate mineral weights
   const generateMineralWeights = () => {
     return new Promise((resolve, reject) => {
       const weights = [];
@@ -128,40 +128,65 @@ const BalancingScales = ({ playerName }) => {
   // Function to print balance info
   const printBalanceInfo = (mainScale, remainingMinerals) => {
     const isEmpty = mainScale[0].length === 0 && mainScale[1].length === 0;
-
     if (!isEmpty) {
       const leftMinerals = mainScale[0];
       const rightMinerals = mainScale[1];
 
       const getWeightSum = (minerals) => {
         return minerals.reduce((totalWeight, mineral) => {
-          const [name, quantityStr] = mineral.split(' ');
-          const quantity = parseInt(quantityStr, 10);
-          const weight = mineralWeights[mineralNames.indexOf(name)] || 0;
-          return totalWeight + (weight * quantity);
+          const index = mineralNames.indexOf(mineral);
+          const weight = index !== -1 ? mineralWeights[index] : 0;
+          return totalWeight + weight;
         }, 0);
       };
 
       const weightLeft = getWeightSum(leftMinerals);
       const weightRight = getWeightSum(rightMinerals);
 
-      addToLog('\nBalance\n');
+      const groupMinerals = (minerals) => {
+        const groups = {};
+        minerals.forEach(mineral => {
+          const [color] = mineral.split(' ');
+          if (!groups[color]) {
+            groups[color] = 0;
+          }
+          groups[color]++;
+        });
+        return groups;
+      };
 
-      if (weightLeft === weightRight) {
+      addToLog('\n--- Balance Information ---');
+      addToLog(`Left side (${leftMinerals.length} cubes)`);
+      const leftGroups = groupMinerals(leftMinerals);
+      Object.entries(leftGroups).forEach(([color, count]) => {
+        addToLog(`  ${count} ${color.toLowerCase()}`);
+      });
+
+      addToLog(`\nRight side (${rightMinerals.length} cubes)`);
+      const rightGroups = groupMinerals(rightMinerals);
+      Object.entries(rightGroups).forEach(([color, count]) => {
+        addToLog(`  ${count} ${color.toLowerCase()}`);
+      });
+
+      addToLog('\nBalance status:');
+      if (Math.abs(weightLeft - weightRight) < 0.001) {
         addToLog('The balance is even.');
       } else if (weightLeft > weightRight) {
         addToLog('The left side is heavier.');
       } else {
         addToLog('The right side is heavier.');
       }
+    } else {
+      addToLog('\nThe balance is empty.');
     }
 
     addToLog('\nRemaining minerals:');
     Object.entries(remainingMinerals).forEach(([color, quantity]) => {
       const formattedColor = color.charAt(0).toUpperCase() + color.slice(1);
-      addToLog(`${formattedColor}: ${quantity}`);
+      addToLog(`  ${formattedColor}: ${quantity}`);
     });
-    addToLog('\n-- End of round --\n');
+
+    addToLog('\n--- End of round ---\n');
   };
 
   // Function to place a mineral on the scale
