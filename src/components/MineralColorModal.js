@@ -6,7 +6,13 @@ import { Modal, Text, View, TouchableOpacity, StyleSheet, Dimensions } from 'rea
 //MineralColorModal component
 const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
     //Colors and buttonColors arrays
-    const colors = ['Red', 'Yellow', 'Green', 'Blue', 'Violet'];
+    const colors = [
+        { key: 'red', label: 'Rojo' },
+        { key: 'yellow', label: 'Amarillo' },
+        { key: 'green', label: 'Verde' },
+        { key: 'blue', label: 'Azul' },
+        { key: 'violet', label: 'Violeta' },
+    ];
     const buttonColors = ['#FF5733', '#FFC300', '#28B463', '#3498DB', '#9B59B6'];
     const screenWidth = Dimensions.get('window').width;
     const buttonWidth = (screenWidth - 80) / colors.length;
@@ -30,14 +36,14 @@ const MineralColorModal = ({ isVisible, onClose, onSelectColor }) => {
                     <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                         <Text style={styles.closeButtonText}>X</Text>
                     </TouchableOpacity>
-                    <Text style={styles.modalText}>Choose the color of the mineral:</Text>
+                    <Text style={styles.modalText}>Elige el color del mineral:</Text>
                     {colors.map((color, index) => (
                         <TouchableOpacity
-                            key={color}
+                            key={color.key}
                             style={[styles.colorButton, { width: buttonWidth, backgroundColor: buttonColors[index] }]}
-                            onPress={() => handleColorSelect(color)}
+                            onPress={() => handleColorSelect(color.key)}
                         >
-                            <Text style={styles.buttonText}>{color}</Text>
+                            <Text style={styles.buttonText}>{color.label}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>

@@ -1,0 +1,13 @@
+{
+  "name": "juegobalanzas-server",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "mongoose": "^8.3.2",
+    "socket.io": "^4.7.0"
+  }
+}
